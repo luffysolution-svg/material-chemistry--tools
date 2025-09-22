@@ -45,8 +45,19 @@
       max-width: 1200px;
       margin: 0 auto;
       padding: 2rem 1.5rem 4rem;
-      display: grid;
-      gap: 2rem;
+    }
+
+    .tab-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .tab-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: flex-start;
     }
 
     section {
@@ -80,7 +91,9 @@
       color: var(--muted);
     }
 
-    input, select, button, textarea {
+    input,
+    select,
+    textarea {
       width: 100%;
       padding: 0.65rem 0.75rem;
       border-radius: 10px;
@@ -88,19 +101,80 @@
       font-size: 1rem;
       box-sizing: border-box;
       font-family: inherit;
+      background: #fff;
     }
 
     button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0.65rem 1.3rem;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+      font-family: inherit;
       background: var(--primary);
       color: #fff;
-      border: none;
       cursor: pointer;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
+      width: auto;
+      max-width: 100%;
     }
 
     button:hover {
       transform: translateY(-1px);
       box-shadow: 0 8px 20px rgba(31, 60, 136, 0.2);
+    }
+
+    button:focus-visible {
+      outline: 3px solid rgba(240, 138, 93, 0.45);
+      outline-offset: 2px;
+    }
+
+    .tab-button {
+      background: rgba(31, 60, 136, 0.08);
+      color: var(--primary);
+      border: 1px solid rgba(31, 60, 136, 0.12);
+      border-radius: 999px;
+      padding: 0.55rem 1.4rem;
+      font-weight: 600;
+    }
+
+    .tab-button:hover {
+      box-shadow: 0 10px 20px rgba(31, 60, 136, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .tab-button.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 12px 26px rgba(31, 60, 136, 0.22);
+    }
+
+    .tab-panel {
+      display: none;
+      animation: fade-in 0.25s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .tab-panel[hidden] {
+      display: none !important;
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .result {
@@ -110,6 +184,78 @@
       border-radius: 10px;
       border: 1px dashed #cfd6e6;
       font-weight: 600;
+    }
+
+    .result-title {
+      margin: 0 0 0.75rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .semiconductor-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.5rem 1rem;
+      margin: 0.25rem 0 0;
+    }
+
+    .semiconductor-details dt {
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .semiconductor-details dd {
+      margin: 0;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .semiconductor-note {
+      margin-top: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    details.reference-card {
+      margin-top: 1.5rem;
+      background: #f7f9fc;
+      border-radius: 12px;
+      border: 1px solid #d7dce5;
+      padding: 1rem 1.25rem;
+    }
+
+    details.reference-card summary {
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text);
+      list-style: none;
+    }
+
+    details.reference-card[open] summary {
+      margin-bottom: 0.75rem;
+    }
+
+    details.reference-card summary::marker {
+      display: none;
+    }
+
+    details.reference-card p {
+      margin-top: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .material-reference-list {
+      margin: 0.5rem 0 0;
+      padding-left: 1.25rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .material-reference-list li strong {
+      color: var(--text);
     }
 
     .periodic-table {
@@ -272,10 +418,20 @@
 <body>
   <header>
     <h1>材料化学科研工具箱</h1>
-    <p>集成单位换算、pH计算、溶液配比、分子质量、晶体学与元素周期表的一体化科研助手</p>
+    <p>集成单位换算、pH计算、溶液配比、分子质量、晶体学、元素周期表与半导体带隙速查的多标签科研助手</p>
   </header>
   <main>
-    <section id="unit-conversion">
+    <div class="tab-container">
+      <div class="tab-list" role="tablist" aria-label="科研工具分类">
+        <button id="tab-unit-conversion" class="tab-button active" data-target="unit-conversion" role="tab" aria-controls="unit-conversion" aria-selected="true">🔁 单位换算</button>
+        <button id="tab-ph" class="tab-button" data-target="ph-calculation" role="tab" aria-controls="ph-calculation" aria-selected="false" tabindex="-1">🧪 pH 计算</button>
+        <button id="tab-solution" class="tab-button" data-target="solution-mixing" role="tab" aria-controls="solution-mixing" aria-selected="false" tabindex="-1">⚗️ 溶液配比</button>
+        <button id="tab-molar" class="tab-button" data-target="molar-mass" role="tab" aria-controls="molar-mass" aria-selected="false" tabindex="-1">🧬 分子质量</button>
+        <button id="tab-crystal" class="tab-button" data-target="crystal-calculation" role="tab" aria-controls="crystal-calculation" aria-selected="false" tabindex="-1">🧱 晶体学</button>
+        <button id="tab-periodic" class="tab-button" data-target="periodic-table-section" role="tab" aria-controls="periodic-table-section" aria-selected="false" tabindex="-1">🧮 元素周期表</button>
+        <button id="tab-semiconductor" class="tab-button" data-target="semiconductor-insights" role="tab" aria-controls="semiconductor-insights" aria-selected="false" tabindex="-1">💡 半导体资料</button>
+      </div>
+      <section id="unit-conversion" class="tab-panel active" role="tabpanel" aria-labelledby="tab-unit-conversion" tabindex="0">
       <h2>🔁 单位换算</h2>
       <div class="grid two-column">
         <div>
@@ -295,11 +451,11 @@
           <select id="conversion-to"></select>
         </div>
       </div>
-      <button id="convert-btn" style="margin-top: 1rem; width: auto; padding-inline: 2rem;">开始换算</button>
+      <button id="convert-btn" style="margin-top: 1rem; padding-inline: 2rem;">开始换算</button>
       <div id="conversion-result" class="result" aria-live="polite"></div>
     </section>
 
-    <section id="ph-calculation">
+    <section id="ph-calculation" class="tab-panel" role="tabpanel" aria-labelledby="tab-ph" tabindex="0" hidden>
       <h2>🧪 pH 值计算</h2>
       <div class="grid two-column">
         <div>
@@ -319,7 +475,7 @@
       <div id="ph-result" class="result" aria-live="polite"></div>
     </section>
 
-    <section id="solution-mixing">
+    <section id="solution-mixing" class="tab-panel" role="tabpanel" aria-labelledby="tab-solution" tabindex="0" hidden>
       <h2>⚗️ 溶液配比</h2>
       <div class="grid two-column">
         <div>
@@ -346,19 +502,19 @@
           <input type="number" step="any" id="solution-c2" placeholder="混合：第二个浓度；稀释：目标浓度" />
         </div>
       </div>
-      <button id="solution-btn" style="margin-top: 1rem; width: auto; padding-inline: 2rem;">计算</button>
+      <button id="solution-btn" style="margin-top: 1rem; padding-inline: 2rem;">计算</button>
       <div id="solution-result" class="result" aria-live="polite"></div>
     </section>
 
-    <section id="molar-mass">
+    <section id="molar-mass" class="tab-panel" role="tabpanel" aria-labelledby="tab-molar" tabindex="0" hidden>
       <h2>🧬 相对分子质量计算</h2>
       <label for="formula-input">输入化学式 (支持括号与水合物，如 Al₂(SO₄)₃·18H₂O)</label>
       <input type="text" id="formula-input" placeholder="例如：C6H12O6" />
-      <button id="molar-btn" style="margin-top: 1rem; width: auto; padding-inline: 2rem;">计算</button>
+      <button id="molar-btn" style="margin-top: 1rem; padding-inline: 2rem;">计算</button>
       <div id="molar-result" class="result" aria-live="polite"></div>
     </section>
 
-    <section id="crystal-calculation">
+    <section id="crystal-calculation" class="tab-panel" role="tabpanel" aria-labelledby="tab-crystal" tabindex="0" hidden>
       <h2>🧱 晶体学计算</h2>
       <p>针对立方晶系，计算晶面间距 d = a / √(h² + k² + l²)。适用于 XRD 数据分析与晶格常数求解。</p>
       <div class="grid two-column">
@@ -379,11 +535,11 @@
           <input type="number" id="miller-l" placeholder="整数" />
         </div>
       </div>
-      <button id="crystal-btn" style="margin-top: 1rem; width: auto; padding-inline: 2rem;">计算晶面间距</button>
+      <button id="crystal-btn" style="margin-top: 1rem; padding-inline: 2rem;">计算晶面间距</button>
       <div id="crystal-result" class="result" aria-live="polite"></div>
     </section>
 
-    <section id="periodic-table-section">
+    <section id="periodic-table-section" class="tab-panel" role="tabpanel" aria-labelledby="tab-periodic" tabindex="0" hidden>
       <h2>🧱 元素周期表</h2>
       <div class="periodic-table" id="periodic-table"></div>
       <div class="legend" id="category-legend"></div>
@@ -392,9 +548,111 @@
         <p>包含原子序数、相对原子质量、电负性、原子半径、第一电离能、熔点、沸点及常温下状态。</p>
       </div>
     </section>
+    <section id="semiconductor-insights" class="tab-panel" role="tabpanel" aria-labelledby="tab-semiconductor" tabindex="0" hidden>
+      <h2>💡 半导体材料带隙速查</h2>
+      <p>快速查询常见半导体材料的带隙类型、晶体结构及典型载流子迁移率，为器件设计与材料筛选提供参考。</p>
+      <div class="grid two-column">
+        <div>
+          <label for="semiconductor-input">选择或输入半导体材料</label>
+          <input type="text" id="semiconductor-input" list="semiconductor-list" placeholder="例如：Si、砷化镓或 GaN" />
+          <datalist id="semiconductor-list"></datalist>
+        </div>
+        <div>
+          <label for="semiconductor-filter">带隙类型筛选</label>
+          <select id="semiconductor-filter">
+            <option value="all">全部类型</option>
+            <option value="direct">直接带隙</option>
+            <option value="indirect">间接带隙</option>
+          </select>
+        </div>
+      </div>
+      <button id="semiconductor-btn" style="margin-top: 1rem; padding-inline: 2rem;">获取材料信息</button>
+      <div id="semiconductor-result" class="result" aria-live="polite"></div>
+      <details class="reference-card">
+        <summary>常见半导体带隙参考</summary>
+        <p>数据以室温下典型值为主，实际数值会随温度、应力和成分变化略有偏差。</p>
+        <ul class="material-reference-list">
+          <li><strong>硅 (Si)</strong> — 间接带隙 1.12 eV，金刚石结构，广泛用于 CMOS 与太阳能电池。</li>
+          <li><strong>砷化镓 (GaAs)</strong> — 直接带隙 1.42 eV，锌闪石结构，适合高速电子器件与光电器件。</li>
+          <li><strong>氮化镓 (GaN)</strong> — 直接带隙 3.4 eV，纤锌矿结构，常用于蓝光 LED 与功率电子。</li>
+          <li><strong>碳化硅 (4H-SiC)</strong> — 间接带隙 3.26 eV，六方结构，适合高温高压功率器件。</li>
+          <li><strong>氧化锌 (ZnO)</strong> — 直接带隙 3.37 eV，纤锌矿结构，用于紫外探测和透明导电膜。</li>
+        </ul>
+      </details>
+    </section>
+    </div>
   </main>
 
   <script>
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    tabPanels.forEach((panel) => {
+      if (!panel.classList.contains('active')) {
+        panel.hidden = true;
+      }
+    });
+
+    tabButtons.forEach((button) => {
+      if (button.classList.contains('active')) {
+        button.setAttribute('tabindex', '0');
+      } else if (!button.hasAttribute('tabindex')) {
+        button.setAttribute('tabindex', '-1');
+      }
+    });
+
+    const switchToTab = (button) => {
+      const targetId = button.dataset.target;
+      const targetPanel = document.getElementById(targetId);
+      if (!targetPanel) return;
+
+      tabButtons.forEach((btn) => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+        btn.setAttribute('tabindex', '-1');
+      });
+
+      tabPanels.forEach((panel) => {
+        panel.classList.remove('active');
+        panel.hidden = true;
+      });
+
+      button.classList.add('active');
+      button.setAttribute('aria-selected', 'true');
+      button.setAttribute('tabindex', '0');
+
+      targetPanel.classList.add('active');
+      targetPanel.hidden = false;
+      if (typeof targetPanel.focus === 'function') {
+        targetPanel.focus({ preventScroll: true });
+      }
+    };
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => switchToTab(button));
+    });
+
+    const switchTabByOffset = (currentIndex, offset) => {
+      const total = tabButtons.length;
+      if (total === 0) return;
+      const nextIndex = (currentIndex + offset + total) % total;
+      const nextTab = tabButtons[nextIndex];
+      nextTab.focus();
+      switchToTab(nextTab);
+    };
+
+    tabButtons.forEach((button, index) => {
+      button.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          switchTabByOffset(index, 1);
+        } else if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          switchTabByOffset(index, -1);
+        }
+      });
+    });
+
     const conversions = {
       长度: {
         米: 1,
@@ -2100,6 +2358,120 @@
     "category": "noble-gas"
   }
 ];
+
+    const semiconductorMaterials = [
+      {
+        name: '硅',
+        formula: 'Si',
+        aliases: ['硅', 'si', 'silicon'],
+        bandGap: { value: 1.12, type: 'indirect', temperature: '300 K' },
+        crystalStructure: '金刚石结构 (Fd3̄m)',
+        electronMobility: '≈ 1350 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 480 cm²·V⁻¹·s⁻¹',
+        applications: 'CMOS 集成电路、太阳能电池、功率器件',
+        notes: '带隙随温度降低略有增大。'
+      },
+      {
+        name: '锗',
+        formula: 'Ge',
+        aliases: ['锗', 'ge', 'germanium'],
+        bandGap: { value: 0.66, type: 'indirect', temperature: '300 K' },
+        crystalStructure: '金刚石结构 (Fd3̄m)',
+        electronMobility: '≈ 3900 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 1900 cm²·V⁻¹·s⁻¹',
+        applications: '高速探测器、红外光电器件、核辐射探测',
+        notes: '可通过应变或合金化提升带隙与性能。'
+      },
+      {
+        name: '砷化镓',
+        formula: 'GaAs',
+        aliases: ['砷化镓', 'gaas', 'gallium arsenide'],
+        bandGap: { value: 1.42, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 8500 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 400 cm²·V⁻¹·s⁻¹',
+        applications: '高速电子器件、激光二极管、高效太阳能电池',
+        notes: '直接带隙使其在光电转换方面表现出色。'
+      },
+      {
+        name: '氮化镓',
+        formula: 'GaN',
+        aliases: ['氮化镓', 'gan', 'gallium nitride'],
+        bandGap: { value: 3.4, type: 'direct', temperature: '300 K' },
+        crystalStructure: '纤锌矿结构 (P6₃mc)',
+        electronMobility: '≈ 1000 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 30 cm²·V⁻¹·s⁻¹',
+        applications: '蓝光 LED、射频功率放大器、汽车电子',
+        notes: '宽禁带半导体，具有高击穿场与耐高温特性。'
+      },
+      {
+        name: '碳化硅 (4H-SiC)',
+        formula: '4H-SiC',
+        aliases: ['碳化硅', 'sic', '4h-sic', 'silicon carbide'],
+        bandGap: { value: 3.26, type: 'indirect', temperature: '300 K' },
+        crystalStructure: '六方 4H 多型 (P6₃mc)',
+        electronMobility: '≈ 950 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 120 cm²·V⁻¹·s⁻¹',
+        applications: '高温高压功率器件、电动汽车逆变器、磨料基底',
+        notes: '热导率高，可在高温 (>600℃) 环境中稳定工作。'
+      },
+      {
+        name: '磷化铟',
+        formula: 'InP',
+        aliases: ['磷化铟', 'inp', 'indium phosphide'],
+        bandGap: { value: 1.34, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 5400 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 200 cm²·V⁻¹·s⁻¹',
+        applications: '高速光通信、激光器、太赫兹器件',
+        notes: '常与 InGaAs 量子阱外延组合用于光通信波段。'
+      },
+      {
+        name: '碲化镉',
+        formula: 'CdTe',
+        aliases: ['碲化镉', 'cdte', 'cadmium telluride'],
+        bandGap: { value: 1.5, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 1100 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 100 cm²·V⁻¹·s⁻¹',
+        applications: '薄膜太阳能电池、伽马射线与 X 射线探测',
+        notes: '与 CdS 缓冲层结合可实现高效光伏器件。'
+      },
+      {
+        name: '氧化锌',
+        formula: 'ZnO',
+        aliases: ['氧化锌', 'zno', 'zinc oxide'],
+        bandGap: { value: 3.37, type: 'direct', temperature: '300 K' },
+        crystalStructure: '纤锌矿结构 (P6₃mc)',
+        electronMobility: '≈ 200 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 5 cm²·V⁻¹·s⁻¹',
+        applications: '紫外探测、透明导电薄膜、压电器件',
+        notes: '本征呈 n 型，空穴注入与掺杂相对困难。'
+      },
+      {
+        name: '二硫化钼',
+        formula: 'MoS₂',
+        aliases: ['二硫化钼', 'mos2', 'molybdenum disulfide'],
+        bandGap: { value: 1.8, type: 'direct', temperature: '室温 (单层)' },
+        crystalStructure: '层状六方 (P6₃/mmc)',
+        electronMobility: '≈ 200 cm²·V⁻¹·s⁻¹（单层）',
+        holeMobility: '≈ 50 cm²·V⁻¹·s⁻¹（单层）',
+        applications: '二维晶体管、柔性电子、光电探测',
+        notes: '块体约为 1.2 eV 间接带隙，单层转变为直接带隙。'
+      },
+      {
+        name: '甲胺铅碘钙钛矿',
+        formula: 'MAPbI₃',
+        aliases: ['mapbi3', 'mapbi₃', '甲胺铅碘', '甲胺铅碘钙钛矿', '钙钛矿太阳能电池'],
+        bandGap: { value: 1.55, type: 'direct', temperature: '300 K' },
+        crystalStructure: '钙钛矿结构 (I4/mcm)',
+        electronMobility: '≈ 50 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 40 cm²·V⁻¹·s⁻¹',
+        applications: '钙钛矿薄膜太阳能电池、光电探测器',
+        notes: '需良好封装以抑制湿度与热导致的退化。'
+      }
+    ];
+
     const elementBySymbol = new Map();
     periodicElements.forEach((element) => {
       elementBySymbol.set(element.symbol, element);
@@ -2446,6 +2818,130 @@
         throw new Error('括号未正确闭合。');
       }
       return stack[0];
+    }
+
+    const semiconductorInput = document.getElementById('semiconductor-input');
+    const semiconductorFilter = document.getElementById('semiconductor-filter');
+    const semiconductorResult = document.getElementById('semiconductor-result');
+    const semiconductorList = document.getElementById('semiconductor-list');
+    const semiconductorButton = document.getElementById('semiconductor-btn');
+
+    if (semiconductorList) {
+      semiconductorMaterials.forEach((material) => {
+        const option = document.createElement('option');
+        option.value = `${material.name} (${material.formula})`;
+        semiconductorList.appendChild(option);
+      });
+    }
+
+    const tokenizeSemiconductorText = (text) => {
+      if (!text) return [];
+      return text
+        .toLowerCase()
+        .replace(/[₀₁₂₃₄₅₆₇₈₉]/g, (digit) => '0123456789'['₀₁₂₃₄₅₆₇₈₉'.indexOf(digit)])
+        .replace(/[()（）·]/g, ' ')
+        .split(/[,，、\/\s]+/)
+        .map((part) => part.trim())
+        .filter(Boolean);
+    };
+
+    const findSemiconductor = (query) => {
+      const tokens = tokenizeSemiconductorText(query);
+      if (!tokens.length) return null;
+      return semiconductorMaterials.find((material) => {
+        const aliasTokens = new Set(
+          material.aliases.flatMap((alias) => tokenizeSemiconductorText(alias))
+        );
+        return tokens.some((token) => aliasTokens.has(token));
+      });
+    };
+
+    const getSemiconductorSuggestions = (typeFilter, limit = 5) =>
+      semiconductorMaterials
+        .filter((material) => typeFilter === 'all' || material.bandGap.type === typeFilter)
+        .slice(0, limit)
+        .map((material) => `${material.name} (${material.formula})`)
+        .join('、');
+
+    const renderSemiconductorResult = (material) => {
+      if (!semiconductorResult) return;
+      const typeLabel = material.bandGap.type === 'direct' ? '直接' : '间接';
+      semiconductorResult.innerHTML = `
+        <div class="result-title">${material.name} (${material.formula})</div>
+        <dl class="semiconductor-details">
+          <dt>带隙</dt><dd>${material.bandGap.value} eV（${typeLabel}，${material.bandGap.temperature}）</dd>
+          <dt>晶体结构</dt><dd>${material.crystalStructure}</dd>
+          <dt>电子迁移率</dt><dd>${material.electronMobility}</dd>
+          <dt>空穴迁移率</dt><dd>${material.holeMobility}</dd>
+          <dt>主要应用</dt><dd>${material.applications}</dd>
+        </dl>
+        ${material.notes ? `<p class="semiconductor-note">备注：${material.notes}</p>` : ''}
+      `;
+    };
+
+    const querySemiconductor = () => {
+      if (!semiconductorResult || !semiconductorInput || !semiconductorFilter) return;
+      const query = semiconductorInput.value.trim();
+      const typeFilter = semiconductorFilter.value;
+
+      if (!query) {
+        const suggestions = getSemiconductorSuggestions(typeFilter);
+        semiconductorResult.textContent = suggestions
+          ? `输入材料名称，例如：${suggestions}`
+          : '请输入需要查询的半导体材料。';
+        return;
+      }
+
+      const material = findSemiconductor(query);
+      if (!material) {
+        const suggestions = getSemiconductorSuggestions(typeFilter);
+        semiconductorResult.textContent = suggestions
+          ? `未找到匹配材料，可尝试：${suggestions}`
+          : '未找到匹配材料，请检查输入。';
+        return;
+      }
+
+      if (typeFilter !== 'all' && material.bandGap.type !== typeFilter) {
+        const typeLabel = material.bandGap.type === 'direct' ? '直接' : '间接';
+        semiconductorResult.textContent = `${material.name} (${material.formula}) 为${typeLabel}带隙材料，请调整筛选条件。`;
+        return;
+      }
+
+      renderSemiconductorResult(material);
+    };
+
+    if (semiconductorResult) {
+      semiconductorResult.textContent = '输入材料名称即可查看带隙、晶体结构及迁移率等信息。';
+    }
+
+    if (semiconductorButton) {
+      semiconductorButton.addEventListener('click', querySemiconductor);
+    }
+
+    if (semiconductorInput) {
+      semiconductorInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          querySemiconductor();
+        }
+      });
+      semiconductorInput.addEventListener('change', () => {
+        if (semiconductorInput.value.trim()) {
+          querySemiconductor();
+        }
+      });
+    }
+
+    if (semiconductorFilter) {
+      semiconductorFilter.addEventListener('change', () => {
+        if (semiconductorInput && semiconductorInput.value.trim()) {
+          querySemiconductor();
+        } else if (semiconductorResult) {
+          const filter = semiconductorFilter.value;
+          const label = filter === 'direct' ? '直接带隙' : filter === 'indirect' ? '间接带隙' : '全部类型';
+          semiconductorResult.textContent = `当前筛选：${label}。输入材料名称即可查看详细数据。`;
+        }
+      });
     }
 
     document.getElementById('molar-btn').addEventListener('click', () => {
