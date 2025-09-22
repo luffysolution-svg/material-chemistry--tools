@@ -1,0 +1,3983 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>材料化学科研工具箱</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --primary: #1f3c88;
+      --secondary: #f2f5fa;
+      --accent: #f08a5d;
+      --text: #2d3142;
+      --muted: #6c757d;
+      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--secondary);
+      color: var(--text);
+    }
+
+    header {
+      background: linear-gradient(120deg, var(--primary), #274690);
+      color: #fff;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      font-size: 1.05rem;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    .tab-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .tab-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: flex-start;
+    }
+
+    section {
+      background: #fff;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 12px 30px rgba(15, 37, 64, 0.08);
+    }
+
+    section h2 {
+      margin-top: 0;
+      font-size: 1.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .two-column {
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid #d7dce5;
+      font-size: 1rem;
+      box-sizing: border-box;
+      font-family: inherit;
+      background: #fff;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0.65rem 1.3rem;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+      font-family: inherit;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      width: auto;
+      max-width: 100%;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(31, 60, 136, 0.2);
+    }
+
+    button:focus-visible {
+      outline: 3px solid rgba(240, 138, 93, 0.45);
+      outline-offset: 2px;
+    }
+
+    .tab-button {
+      background: rgba(31, 60, 136, 0.08);
+      color: var(--primary);
+      border: 1px solid rgba(31, 60, 136, 0.12);
+      border-radius: 999px;
+      padding: 0.55rem 1.4rem;
+      font-weight: 600;
+    }
+
+    .tab-button:hover {
+      box-shadow: 0 10px 20px rgba(31, 60, 136, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .tab-button.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 12px 26px rgba(31, 60, 136, 0.22);
+    }
+
+    .tab-panel {
+      display: none;
+      animation: fade-in 0.25s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .tab-panel[hidden] {
+      display: none !important;
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result {
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      background: #f7f9fc;
+      border-radius: 10px;
+      border: 1px dashed #cfd6e6;
+      font-weight: 600;
+    }
+
+    .result-title {
+      margin: 0 0 0.75rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .conversion-extra {
+      margin-top: 1rem;
+      padding: 1rem 1.25rem;
+      background: #f7f9fc;
+      border-radius: 12px;
+      border: 1px solid #d7dce5;
+    }
+
+    .conversion-extra[hidden] {
+      display: none;
+    }
+
+    .info-card {
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      border: 1px solid #d7dce5;
+      background: #fff;
+      min-height: 2.75rem;
+      display: flex;
+      align-items: center;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .info-card.error {
+      border-color: #e55353;
+      color: #c0392b;
+      background: #fdecea;
+    }
+
+    .conversion-hint {
+      margin: 0.75rem 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .semiconductor-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.5rem 1rem;
+      margin: 0.25rem 0 0;
+    }
+
+    .semiconductor-details dt {
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .semiconductor-details dd {
+      margin: 0;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .alias-list {
+      margin: 0.75rem 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .alias-list span {
+      display: inline-block;
+      margin: 0.2rem 0.35rem 0 0;
+      background: rgba(31, 60, 136, 0.08);
+      color: var(--primary);
+      padding: 0.3rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .semiconductor-note {
+      margin-top: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .mp-data {
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid #e2e8f5;
+    }
+
+    .mp-data h4 {
+      margin: 0 0 0.5rem;
+      font-size: 1.05rem;
+      color: var(--primary);
+    }
+
+    .api-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .api-actions > div {
+      flex: 1 1 220px;
+    }
+
+    .api-hint {
+      margin-top: 0.75rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .api-status {
+      margin-top: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px dashed #cfd6e6;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .api-status.error {
+      border-color: #e55353;
+      color: #c0392b;
+      background: #fdecea;
+    }
+
+    details.reference-card {
+      margin-top: 1.5rem;
+      background: #f7f9fc;
+      border-radius: 12px;
+      border: 1px solid #d7dce5;
+      padding: 1rem 1.25rem;
+    }
+
+    details.reference-card summary {
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text);
+      list-style: none;
+    }
+
+    details.reference-card[open] summary {
+      margin-bottom: 0.75rem;
+    }
+
+    details.reference-card summary::marker {
+      display: none;
+    }
+
+    details.reference-card p {
+      margin-top: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .material-reference-list {
+      margin: 0.5rem 0 0;
+      padding-left: 1.25rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .material-reference-list li strong {
+      color: var(--text);
+    }
+
+    .periodic-table {
+      display: grid;
+      grid-template-columns: repeat(18, minmax(45px, 1fr));
+      gap: 8px;
+      justify-items: stretch;
+    }
+
+    .element {
+      border-radius: 10px;
+      padding: 0.6rem 0.4rem;
+      text-align: center;
+      background: #e4e9f2;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.25rem;
+    }
+
+    .element strong {
+      font-size: 1.05rem;
+      color: #1b2845;
+    }
+
+    .element span {
+      font-size: 0.75rem;
+      color: #1b2845;
+    }
+
+    .element:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(43, 66, 117, 0.25);
+    }
+
+    .element-info {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      border-radius: 14px;
+      background: #f7fbff;
+      border: 1px solid #d6e4ff;
+    }
+
+    .element-info h3 {
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      font-size: 1.4rem;
+    }
+
+    .element-info dl {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.5rem 1rem;
+      margin: 0;
+    }
+
+    .element-info dt {
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .element-info dd {
+      margin: 0;
+      font-size: 1.05rem;
+      color: var(--text);
+    }
+
+
+    .element .number {
+      font-size: 0.65rem;
+      color: var(--muted);
+    }
+
+    .element.selected {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .empty {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .legend {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .legend-item {
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      color: #1b2845;
+      background: #e4e9f2;
+      box-shadow: inset 0 0 0 1px rgba(27, 40, 69, 0.08);
+    }
+
+    .element-meta {
+      margin: 0.25rem 0 1rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .element.category-alkali, .legend-item.category-alkali {
+      background: #ffe0cc;
+    }
+
+    .element.category-alkaline, .legend-item.category-alkaline {
+      background: #fff1c1;
+    }
+
+    .element.category-transition, .legend-item.category-transition {
+      background: #dbe9ff;
+    }
+
+    .element.category-post-transition, .legend-item.category-post-transition {
+      background: #e4dcff;
+    }
+
+    .element.category-metalloid, .legend-item.category-metalloid {
+      background: #fde7b0;
+    }
+
+    .element.category-nonmetal, .legend-item.category-nonmetal {
+      background: #d7f5df;
+    }
+
+    .element.category-halogen, .legend-item.category-halogen {
+      background: #ffe1e1;
+    }
+
+    .element.category-noble-gas, .legend-item.category-noble-gas {
+      background: #d9f0ff;
+    }
+
+    .element.category-lanthanoid, .legend-item.category-lanthanoid {
+      background: #fbe0f0;
+    }
+
+    .element.category-actinoid, .legend-item.category-actinoid {
+      background: #eadffb;
+    }
+
+    @media (max-width: 900px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      .periodic-table {
+        grid-template-columns: repeat(9, minmax(45px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>材料化学科研工具箱</h1>
+    <p>集成单位换算、pH计算、溶液配比、分子质量、晶体学、元素周期表与半导体带隙速查的多标签科研助手</p>
+  </header>
+  <main>
+    <div class="tab-container">
+      <div class="tab-list" role="tablist" aria-label="科研工具分类">
+        <button id="tab-unit-conversion" class="tab-button active" data-target="unit-conversion" role="tab" aria-controls="unit-conversion" aria-selected="true">🔁 单位换算</button>
+        <button id="tab-ph" class="tab-button" data-target="ph-calculation" role="tab" aria-controls="ph-calculation" aria-selected="false" tabindex="-1">🧪 pH 计算</button>
+        <button id="tab-solution" class="tab-button" data-target="solution-mixing" role="tab" aria-controls="solution-mixing" aria-selected="false" tabindex="-1">⚗️ 溶液配比</button>
+        <button id="tab-molar" class="tab-button" data-target="molar-mass" role="tab" aria-controls="molar-mass" aria-selected="false" tabindex="-1">🧬 分子质量</button>
+        <button id="tab-crystal" class="tab-button" data-target="crystal-calculation" role="tab" aria-controls="crystal-calculation" aria-selected="false" tabindex="-1">🧱 晶体学</button>
+        <button id="tab-periodic" class="tab-button" data-target="periodic-table-section" role="tab" aria-controls="periodic-table-section" aria-selected="false" tabindex="-1">🧮 元素周期表</button>
+        <button id="tab-semiconductor" class="tab-button" data-target="semiconductor-insights" role="tab" aria-controls="semiconductor-insights" aria-selected="false" tabindex="-1">💡 半导体资料</button>
+      </div>
+      <section id="unit-conversion" class="tab-panel active" role="tabpanel" aria-labelledby="tab-unit-conversion" tabindex="0">
+      <h2>🔁 单位换算</h2>
+      <div class="grid two-column">
+        <div>
+          <label for="conversion-category">换算类型</label>
+          <select id="conversion-category"></select>
+        </div>
+        <div>
+          <label for="conversion-value">输入数值</label>
+          <input type="number" id="conversion-value" placeholder="例如：1" />
+        </div>
+        <div>
+          <label for="conversion-from">原始单位</label>
+          <select id="conversion-from"></select>
+        </div>
+        <div>
+          <label for="conversion-to">目标单位</label>
+          <select id="conversion-to"></select>
+        </div>
+      </div>
+      <div id="conversion-chemical-section" class="conversion-extra" hidden>
+        <div class="grid two-column">
+          <div>
+            <label for="conversion-formula">输入化学式以关联摩尔质量</label>
+            <input type="text" id="conversion-formula" placeholder="例如：H2SO4 或 CuSO4·5H2O" autocomplete="off" />
+          </div>
+          <div>
+            <label>摩尔质量 (g·mol⁻¹)</label>
+            <div id="conversion-molar-display" class="info-card" role="status" aria-live="polite">输入化学式后自动计算</div>
+          </div>
+        </div>
+        <p id="conversion-formula-hint" class="conversion-hint">可输入含括号、带结晶水的化学式，系统会自动解析并用于质量与物质的量之间的换算。</p>
+      </div>
+      <button id="convert-btn" style="margin-top: 1rem; padding-inline: 2rem;">开始换算</button>
+      <div id="conversion-result" class="result" aria-live="polite"></div>
+    </section>
+
+    <section id="ph-calculation" class="tab-panel" role="tabpanel" aria-labelledby="tab-ph" tabindex="0" hidden>
+      <h2>🧪 pH 值计算</h2>
+      <div class="grid two-column">
+        <div>
+          <label for="ph-type">溶液类型</label>
+          <select id="ph-type">
+            <option value="acid">强酸 (已知 [H⁺])</option>
+            <option value="base">强碱 (已知 [OH⁻])</option>
+            <option value="concentration">由 pH 反推浓度</option>
+          </select>
+        </div>
+        <div>
+          <label for="ph-input">输入数值</label>
+          <input type="number" step="any" id="ph-input" placeholder="浓度 (mol·L⁻¹) 或 pH" />
+        </div>
+      </div>
+      <button id="ph-btn" style="margin-top: 1rem; width: auto; padding-inline: 2rem;">计算</button>
+      <div id="ph-result" class="result" aria-live="polite"></div>
+    </section>
+
+    <section id="solution-mixing" class="tab-panel" role="tabpanel" aria-labelledby="tab-solution" tabindex="0" hidden>
+      <h2>⚗️ 溶液配比</h2>
+      <div class="grid two-column">
+        <div>
+          <label for="solution-mode">计算模式</label>
+          <select id="solution-mode">
+            <option value="mix">溶液混合 (同溶质)</option>
+            <option value="dilution">稀释计算 (C₁V₁ = C₂V₂)</option>
+          </select>
+        </div>
+        <div>
+          <label for="solution-v1">溶液1体积 (mL)</label>
+          <input type="number" id="solution-v1" placeholder="例如：50" />
+        </div>
+        <div>
+          <label for="solution-c1">溶液1浓度 (mol·L⁻¹)</label>
+          <input type="number" step="any" id="solution-c1" placeholder="例如：0.5" />
+        </div>
+        <div>
+          <label for="solution-v2">溶液2体积 (mL 或 目标体积)</label>
+          <input type="number" id="solution-v2" placeholder="混合：第二个体积；稀释：目标总体积" />
+        </div>
+        <div>
+          <label for="solution-c2">溶液2浓度 (mol·L⁻¹ 或 目标浓度)</label>
+          <input type="number" step="any" id="solution-c2" placeholder="混合：第二个浓度；稀释：目标浓度" />
+        </div>
+      </div>
+      <button id="solution-btn" style="margin-top: 1rem; padding-inline: 2rem;">计算</button>
+      <div id="solution-result" class="result" aria-live="polite"></div>
+    </section>
+
+    <section id="molar-mass" class="tab-panel" role="tabpanel" aria-labelledby="tab-molar" tabindex="0" hidden>
+      <h2>🧬 相对分子质量计算</h2>
+      <label for="formula-input">输入化学式 (支持括号与水合物，如 Al₂(SO₄)₃·18H₂O)</label>
+      <input type="text" id="formula-input" placeholder="例如：C6H12O6" />
+      <button id="molar-btn" style="margin-top: 1rem; padding-inline: 2rem;">计算</button>
+      <div id="molar-result" class="result" aria-live="polite"></div>
+    </section>
+
+    <section id="crystal-calculation" class="tab-panel" role="tabpanel" aria-labelledby="tab-crystal" tabindex="0" hidden>
+      <h2>🧱 晶体学计算</h2>
+      <p>针对立方晶系，计算晶面间距 d = a / √(h² + k² + l²)。适用于 XRD 数据分析与晶格常数求解。</p>
+      <div class="grid two-column">
+        <div>
+          <label for="lattice-a">晶胞常数 a (Å)</label>
+          <input type="number" step="any" id="lattice-a" placeholder="例如：3.615" />
+        </div>
+        <div>
+          <label for="miller-h">米勒指数 h</label>
+          <input type="number" id="miller-h" placeholder="整数" />
+        </div>
+        <div>
+          <label for="miller-k">米勒指数 k</label>
+          <input type="number" id="miller-k" placeholder="整数" />
+        </div>
+        <div>
+          <label for="miller-l">米勒指数 l</label>
+          <input type="number" id="miller-l" placeholder="整数" />
+        </div>
+      </div>
+      <button id="crystal-btn" style="margin-top: 1rem; padding-inline: 2rem;">计算晶面间距</button>
+      <div id="crystal-result" class="result" aria-live="polite"></div>
+    </section>
+
+    <section id="periodic-table-section" class="tab-panel" role="tabpanel" aria-labelledby="tab-periodic" tabindex="0" hidden>
+      <h2>🧱 元素周期表</h2>
+      <div class="periodic-table" id="periodic-table"></div>
+      <div class="legend" id="category-legend"></div>
+      <div class="element-info" id="element-info">
+        <h3>点击元素查看详细信息</h3>
+        <p>包含原子序数、相对原子质量、电负性、原子半径、第一电离能、熔点、沸点及常温下状态。</p>
+      </div>
+    </section>
+    <section id="semiconductor-insights" class="tab-panel" role="tabpanel" aria-labelledby="tab-semiconductor" tabindex="0" hidden>
+      <h2>💡 半导体材料带隙速查</h2>
+      <p>快速查询常见半导体材料的带隙类型、晶体结构及典型载流子迁移率，为器件设计与材料筛选提供参考。</p>
+      <div class="grid two-column">
+        <div>
+          <label for="semiconductor-input">选择或输入半导体材料</label>
+          <input type="text" id="semiconductor-input" list="semiconductor-list" placeholder="例如：Si、砷化镓或 GaN" />
+          <datalist id="semiconductor-list"></datalist>
+        </div>
+        <div>
+          <label for="semiconductor-filter">带隙类型筛选</label>
+          <select id="semiconductor-filter">
+            <option value="all">全部类型</option>
+            <option value="direct">直接带隙</option>
+            <option value="indirect">间接带隙</option>
+          </select>
+        </div>
+      </div>
+      <button id="semiconductor-btn" style="margin-top: 1rem; padding-inline: 2rem;">获取材料信息</button>
+      <div id="semiconductor-result" class="result" aria-live="polite"></div>
+      <details class="reference-card">
+        <summary>Materials Project 数据同步</summary>
+        <div class="api-actions">
+          <div>
+            <label for="materials-project-key">API Token</label>
+            <input
+              type="password"
+              id="materials-project-key"
+              placeholder="请输入 Materials Project token"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              inputmode="text"
+            />
+          </div>
+          <div>
+            <label for="materials-project-sync-btn">&nbsp;</label>
+            <button type="button" id="materials-project-sync-btn" style="width: 100%;" disabled>同步半导体数据</button>
+          </div>
+        </div>
+        <p class="api-hint">内置数据库已覆盖常见半导体，若需补充长尾材料，请通过后端代理调用 Materials Project 接口。出于安全考虑，密钥仅用于当前同步请求，不会写入浏览器存储。</p>
+        <div
+          id="materials-project-status"
+          class="api-status"
+          aria-live="polite"
+          data-state="idle"
+        >请输入 Materials Project API token 以启用同步；若由服务器代理，请确认已配置凭据。密钥仅在请求期间保留于内存。</div>
+      </details>
+      <details class="reference-card">
+        <summary>常见半导体带隙参考</summary>
+        <p>数据以室温下典型值为主，实际数值会随温度、应力和成分变化略有偏差。</p>
+        <ul class="material-reference-list">
+          <li><strong>硅 (Si)</strong> — 间接带隙 1.12 eV，金刚石结构，广泛用于 CMOS 与太阳能电池。</li>
+          <li><strong>砷化镓 (GaAs)</strong> — 直接带隙 1.42 eV，锌闪石结构，适合高速电子器件与光电器件。</li>
+          <li><strong>氮化镓 (GaN)</strong> — 直接带隙 3.4 eV，纤锌矿结构，常用于蓝光 LED 与功率电子。</li>
+          <li><strong>碳化硅 (4H-SiC)</strong> — 间接带隙 3.26 eV，六方结构，适合高温高压功率器件。</li>
+          <li><strong>氧化锌 (ZnO)</strong> — 直接带隙 3.37 eV，纤锌矿结构，用于紫外探测和透明导电膜。</li>
+        </ul>
+      </details>
+    </section>
+    </div>
+  </main>
+
+  <script>
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    tabPanels.forEach((panel) => {
+      if (!panel.classList.contains('active')) {
+        panel.hidden = true;
+      }
+    });
+
+    tabButtons.forEach((button) => {
+      if (button.classList.contains('active')) {
+        button.setAttribute('tabindex', '0');
+      } else if (!button.hasAttribute('tabindex')) {
+        button.setAttribute('tabindex', '-1');
+      }
+    });
+
+    const switchToTab = (button) => {
+      const targetId = button.dataset.target;
+      const targetPanel = document.getElementById(targetId);
+      if (!targetPanel) return;
+
+      tabButtons.forEach((btn) => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+        btn.setAttribute('tabindex', '-1');
+      });
+
+      tabPanels.forEach((panel) => {
+        panel.classList.remove('active');
+        panel.hidden = true;
+      });
+
+      button.classList.add('active');
+      button.setAttribute('aria-selected', 'true');
+      button.setAttribute('tabindex', '0');
+
+      targetPanel.classList.add('active');
+      targetPanel.hidden = false;
+      if (typeof targetPanel.focus === 'function') {
+        targetPanel.focus({ preventScroll: true });
+      }
+    };
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => switchToTab(button));
+    });
+
+    const switchTabByOffset = (currentIndex, offset) => {
+      const total = tabButtons.length;
+      if (total === 0) return;
+      const nextIndex = (currentIndex + offset + total) % total;
+      const nextTab = tabButtons[nextIndex];
+      nextTab.focus();
+      switchToTab(nextTab);
+    };
+
+    tabButtons.forEach((button, index) => {
+      button.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          switchTabByOffset(index, 1);
+        } else if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          switchTabByOffset(index, -1);
+        }
+      });
+    });
+
+    const conversions = {
+      长度: {
+        米: 1,
+        厘米: 0.01,
+        毫米: 0.001,
+        微米: 1e-6,
+        纳米: 1e-9,
+        埃: 1e-10
+      },
+      质量: {
+        千克: 1,
+        克: 1e-3,
+        毫克: 1e-6,
+        微克: 1e-9
+      },
+      体积: {
+        立方米: 1,
+        升: 0.001,
+        毫升: 1e-6,
+        微升: 1e-9
+      },
+      压力: {
+        帕: 1,
+        千帕: 1e3,
+        兆帕: 1e6,
+        巴: 1e5,
+        标准大气压: 101325
+      },
+      能量: {
+        焦耳: 1,
+        千焦: 1e3,
+        卡路里: 4.184,
+        电子伏: 1.60218e-19
+      },
+      温度: {
+        摄氏度: 'C',
+        华氏度: 'F',
+        开尔文: 'K'
+      }
+    };
+
+    const MASS_AMOUNT_CATEGORY_KEY = '质量-物质的量';
+    const massAmountUnits = {
+      '千克 (kg)': { type: 'mass', factor: 1000 },
+      '克 (g)': { type: 'mass', factor: 1 },
+      '毫克 (mg)': { type: 'mass', factor: 1e-3 },
+      '微克 (μg)': { type: 'mass', factor: 1e-6 },
+      '摩尔 (mol)': { type: 'amount', factor: 1 },
+      '毫摩尔 (mmol)': { type: 'amount', factor: 1e-3 },
+      '微摩尔 (μmol)': { type: 'amount', factor: 1e-6 }
+    };
+
+    const categorySelect = document.getElementById('conversion-category');
+    const fromSelect = document.getElementById('conversion-from');
+    const toSelect = document.getElementById('conversion-to');
+    const valueInput = document.getElementById('conversion-value');
+    const resultDiv = document.getElementById('conversion-result');
+    const conversionFormulaSection = document.getElementById('conversion-chemical-section');
+    const conversionFormulaInput = document.getElementById('conversion-formula');
+    const conversionMolarDisplay = document.getElementById('conversion-molar-display');
+    let conversionMolarMass = null;
+
+    const conversionCategories = [...Object.keys(conversions), MASS_AMOUNT_CATEGORY_KEY];
+
+    function populateUnits(category) {
+      fromSelect.innerHTML = '';
+      toSelect.innerHTML = '';
+
+      if (category === MASS_AMOUNT_CATEGORY_KEY) {
+        Object.keys(massAmountUnits).forEach((unit) => {
+          const optionFrom = document.createElement('option');
+          optionFrom.value = unit;
+          optionFrom.textContent = unit;
+          fromSelect.appendChild(optionFrom);
+
+          const optionTo = document.createElement('option');
+          optionTo.value = unit;
+          optionTo.textContent = unit;
+          toSelect.appendChild(optionTo);
+        });
+        if (fromSelect.querySelector('option[value="克 (g)"]')) {
+          fromSelect.value = '克 (g)';
+        }
+        if (toSelect.querySelector('option[value="摩尔 (mol)"]')) {
+          toSelect.value = '摩尔 (mol)';
+        } else if (toSelect.options.length > 1) {
+          toSelect.selectedIndex = 1;
+        }
+        return;
+      }
+
+      const units = conversions[category];
+      if (!units) return;
+      Object.keys(units).forEach((unit) => {
+        const optionFrom = document.createElement('option');
+        optionFrom.value = unit;
+        optionFrom.textContent = unit;
+        fromSelect.appendChild(optionFrom);
+
+        const optionTo = document.createElement('option');
+        optionTo.value = unit;
+        optionTo.textContent = unit;
+        toSelect.appendChild(optionTo);
+      });
+      if (toSelect.options.length > 1) {
+        toSelect.selectedIndex = 1;
+      }
+    }
+
+    conversionCategories.forEach((category, index) => {
+      const option = document.createElement('option');
+      option.value = category;
+      option.textContent = category;
+      if (index === 0) {
+        option.selected = true;
+      }
+      categorySelect.appendChild(option);
+    });
+
+    function updateConversionMolarInfo() {
+      if (!conversionFormulaInput || !conversionMolarDisplay) return;
+      const formula = conversionFormulaInput.value.trim();
+      if (!formula) {
+        conversionMolarMass = null;
+        conversionMolarDisplay.textContent = '输入化学式后自动计算';
+        conversionMolarDisplay.classList.remove('error');
+        return;
+      }
+      try {
+        const { molarMass } = calculateMolarMass(formula);
+        conversionMolarMass = molarMass;
+        conversionMolarDisplay.textContent = `${formatNumber(molarMass, { digits: 3 })} g·mol⁻¹`;
+        conversionMolarDisplay.classList.remove('error');
+      } catch (error) {
+        conversionMolarMass = null;
+        conversionMolarDisplay.textContent = error.message;
+        conversionMolarDisplay.classList.add('error');
+      }
+    }
+
+    function toggleConversionFormulaSection(category) {
+      if (!conversionFormulaSection) return;
+      const show = category === MASS_AMOUNT_CATEGORY_KEY;
+      conversionFormulaSection.hidden = !show;
+      if (!show) {
+        conversionMolarMass = null;
+        if (conversionFormulaInput) {
+          conversionFormulaInput.value = '';
+        }
+        if (conversionMolarDisplay) {
+          conversionMolarDisplay.textContent = '输入化学式后自动计算';
+          conversionMolarDisplay.classList.remove('error');
+        }
+      } else if (conversionFormulaInput && conversionFormulaInput.value.trim()) {
+        updateConversionMolarInfo();
+      }
+    }
+
+    if (conversionFormulaInput) {
+      conversionFormulaInput.addEventListener('input', updateConversionMolarInfo);
+      conversionFormulaInput.addEventListener('change', updateConversionMolarInfo);
+    }
+
+    const initialCategory = categorySelect.value || conversionCategories[0];
+    populateUnits(initialCategory);
+    toggleConversionFormulaSection(initialCategory);
+
+    categorySelect.addEventListener('change', () => {
+      const category = categorySelect.value;
+      populateUnits(category);
+      toggleConversionFormulaSection(category);
+    });
+
+    document.getElementById('convert-btn').addEventListener('click', () => {
+      const category = categorySelect.value;
+      const fromUnit = fromSelect.value;
+      const toUnit = toSelect.value;
+      const value = parseFloat(valueInput.value);
+
+      if (Number.isNaN(value)) {
+        resultDiv.textContent = '请输入需要换算的数值。';
+        return;
+      }
+
+      if (category === MASS_AMOUNT_CATEGORY_KEY) {
+        const fromMeta = massAmountUnits[fromUnit];
+        const toMeta = massAmountUnits[toUnit];
+        if (!fromMeta || !toMeta) {
+          resultDiv.textContent = '请选择有效的单位。';
+          return;
+        }
+
+        const crossType = fromMeta.type !== toMeta.type;
+        let molarMassValue = conversionMolarMass;
+        const formula = conversionFormulaInput ? conversionFormulaInput.value.trim() : '';
+
+        if (crossType) {
+          if (!formula) {
+            resultDiv.textContent = '请输入物质的化学式，以便在质量与物质的量之间转换。';
+            return;
+          }
+          try {
+            const { molarMass } = calculateMolarMass(formula);
+            molarMassValue = molarMass;
+            conversionMolarMass = molarMass;
+            if (conversionMolarDisplay) {
+              conversionMolarDisplay.textContent = `${formatNumber(molarMass, { digits: 3 })} g·mol⁻¹`;
+              conversionMolarDisplay.classList.remove('error');
+            }
+          } catch (error) {
+            resultDiv.textContent = error.message;
+            if (conversionMolarDisplay) {
+              conversionMolarDisplay.textContent = error.message;
+              conversionMolarDisplay.classList.add('error');
+            }
+            return;
+          }
+        }
+
+        const digits = Math.abs(value) < 1 ? 6 : 4;
+
+        if (fromMeta.type === 'mass' && toMeta.type === 'mass') {
+          const baseMass = value * fromMeta.factor;
+          const converted = baseMass / toMeta.factor;
+          resultDiv.textContent = `${value} ${fromUnit} = ${formatNumber(converted, { digits })} ${toUnit}`;
+          return;
+        }
+
+        if (fromMeta.type === 'amount' && toMeta.type === 'amount') {
+          const baseAmount = value * fromMeta.factor;
+          const converted = baseAmount / toMeta.factor;
+          resultDiv.textContent = `${value} ${fromUnit} = ${formatNumber(converted, { digits })} ${toUnit}`;
+          return;
+        }
+
+        if (!molarMassValue) {
+          resultDiv.textContent = '请先输入有效的化学式以计算摩尔质量。';
+          return;
+        }
+
+        const safeFormula = escapeHtml(formula || '目标物质');
+        if (fromMeta.type === 'mass' && toMeta.type === 'amount') {
+          const massInGrams = value * fromMeta.factor;
+          const amountInMol = massInGrams / molarMassValue;
+          const converted = amountInMol / toMeta.factor;
+          resultDiv.innerHTML = `${value} ${fromUnit} = ${formatNumber(converted, { digits })} ${toUnit}<br>所用物质：<strong>${safeFormula}</strong>，摩尔质量 M = ${formatNumber(molarMassValue, { digits: 3 })} g·mol⁻¹`;
+          return;
+        }
+
+        if (fromMeta.type === 'amount' && toMeta.type === 'mass') {
+          const amountInMol = value * fromMeta.factor;
+          const massInGrams = amountInMol * molarMassValue;
+          const converted = massInGrams / toMeta.factor;
+          resultDiv.innerHTML = `${value} ${fromUnit} = ${formatNumber(converted, { digits })} ${toUnit}<br>所用物质：<strong>${safeFormula}</strong>，摩尔质量 M = ${formatNumber(molarMassValue, { digits: 3 })} g·mol⁻¹`;
+          return;
+        }
+
+        resultDiv.textContent = '暂不支持该组合的换算。';
+        return;
+      }
+
+      const units = conversions[category];
+      if (!units || units[fromUnit] === undefined || units[toUnit] === undefined) {
+        resultDiv.textContent = '请选择有效的换算类型与单位。';
+        return;
+      }
+
+      if (category === '温度') {
+        const converted = convertTemperature(value, units[fromUnit], units[toUnit]);
+        resultDiv.textContent = `${value} ${fromUnit} = ${converted.toFixed(4)} ${toUnit}`;
+        return;
+      }
+
+      const baseValue = value * units[fromUnit];
+      const converted = baseValue / units[toUnit];
+      const precision = Math.abs(converted) < 1 ? 6 : 4;
+      resultDiv.textContent = `${value} ${fromUnit} = ${converted.toFixed(precision)} ${toUnit}`;
+    });
+
+    function convertTemperature(value, fromUnit, toUnit) {
+      let celsius;
+      if (fromUnit === 'C') {
+        celsius = value;
+      } else if (fromUnit === 'F') {
+        celsius = (value - 32) * (5 / 9);
+      } else {
+        celsius = value - 273.15;
+      }
+
+      if (toUnit === 'C') return celsius;
+      if (toUnit === 'F') return celsius * 9 / 5 + 32;
+      return celsius + 273.15;
+    }
+
+    // pH calculator
+    document.getElementById('ph-btn').addEventListener('click', () => {
+      const type = document.getElementById('ph-type').value;
+      const value = parseFloat(document.getElementById('ph-input').value);
+      const output = document.getElementById('ph-result');
+
+      if (Number.isNaN(value)) {
+        output.textContent = '请输入有效的数值。';
+        return;
+      }
+
+      if (type === 'acid') {
+        const pH = -Math.log10(value);
+        output.textContent = `强酸溶液的 pH = ${pH.toFixed(3)}，pOH = ${(14 - pH).toFixed(3)}`;
+      } else if (type === 'base') {
+        const pOH = -Math.log10(value);
+        const pH = 14 - pOH;
+        output.textContent = `强碱溶液的 pH = ${pH.toFixed(3)}，pOH = ${pOH.toFixed(3)}`;
+      } else {
+        const concentration = Math.pow(10, -value);
+        output.textContent = `pH = ${value.toFixed(3)} 对应 [H⁺] = ${concentration.toExponential(3)} mol·L⁻¹`;
+      }
+    });
+
+    // solution mixing
+    document.getElementById('solution-btn').addEventListener('click', () => {
+      const mode = document.getElementById('solution-mode').value;
+      const v1 = parseFloat(document.getElementById('solution-v1').value);
+      const c1 = parseFloat(document.getElementById('solution-c1').value);
+      const v2 = parseFloat(document.getElementById('solution-v2').value);
+      const c2 = parseFloat(document.getElementById('solution-c2').value);
+      const output = document.getElementById('solution-result');
+
+      if (mode === 'mix') {
+        if ([v1, c1, v2, c2].some((v) => Number.isNaN(v))) {
+          output.textContent = '请输入全部四个参数以计算混合溶液浓度。';
+          return;
+        }
+        const totalVolume = (v1 + v2) / 1000;
+        const totalMoles = c1 * v1 / 1000 + c2 * v2 / 1000;
+        const finalConcentration = totalMoles / totalVolume;
+        output.textContent = `混合后总体积 ${(v1 + v2).toFixed(2)} mL，对应浓度 ${finalConcentration.toFixed(4)} mol·L⁻¹。`;
+      } else {
+        if ([v1, c1, v2].some((v) => Number.isNaN(v))) {
+          output.textContent = '稀释计算需要输入原始体积、原始浓度和目标体积。';
+          return;
+        }
+        const finalConcentration = c1 * v1 / v2;
+        output.textContent = `稀释后浓度为 ${finalConcentration.toFixed(4)} mol·L⁻¹。若需目标浓度 ${Number.isNaN(c2) ? '(未输入)' : c2.toFixed(4)}，可调节参数。`;
+      }
+    });
+
+    // molar mass calculator
+    const elementMass = {};
+
+    const periodicElements = [
+  {
+    "number": 1,
+    "symbol": "H",
+    "name": "氢",
+    "atomicMass": 1.008,
+    "electronegativity": 2.2,
+    "atomicRadius": 53.0,
+    "ionizationEnergy": 1312.0,
+    "meltingPoint": 14.01,
+    "boilingPoint": 20.28,
+    "state": "气态",
+    "category": "nonmetal"
+  },
+  {
+    "number": 2,
+    "symbol": "He",
+    "name": "氦",
+    "atomicMass": 4.0026,
+    "electronegativity": null,
+    "atomicRadius": 31.0,
+    "ionizationEnergy": 2372.0,
+    "meltingPoint": 0.95,
+    "boilingPoint": 4.22,
+    "state": "气态",
+    "category": "noble-gas"
+  },
+  {
+    "number": 3,
+    "symbol": "Li",
+    "name": "锂",
+    "atomicMass": 6.94,
+    "electronegativity": 0.98,
+    "atomicRadius": 167.0,
+    "ionizationEnergy": 520.0,
+    "meltingPoint": 453.69,
+    "boilingPoint": 1615.0,
+    "state": "固态",
+    "category": "alkali"
+  },
+  {
+    "number": 4,
+    "symbol": "Be",
+    "name": "铍",
+    "atomicMass": 9.0122,
+    "electronegativity": 1.57,
+    "atomicRadius": 112.0,
+    "ionizationEnergy": 899.0,
+    "meltingPoint": 1560.0,
+    "boilingPoint": 2742.0,
+    "state": "固态",
+    "category": "alkaline"
+  },
+  {
+    "number": 5,
+    "symbol": "B",
+    "name": "硼",
+    "atomicMass": 10.81,
+    "electronegativity": 2.04,
+    "atomicRadius": 87.0,
+    "ionizationEnergy": 801.0,
+    "meltingPoint": 2349.0,
+    "boilingPoint": 4200.0,
+    "state": "固态",
+    "category": "metalloid"
+  },
+  {
+    "number": 6,
+    "symbol": "C",
+    "name": "碳",
+    "atomicMass": 12.011,
+    "electronegativity": 2.55,
+    "atomicRadius": 67.0,
+    "ionizationEnergy": 1086.0,
+    "meltingPoint": 3823.0,
+    "boilingPoint": 4300.0,
+    "state": "固态",
+    "category": "nonmetal"
+  },
+  {
+    "number": 7,
+    "symbol": "N",
+    "name": "氮",
+    "atomicMass": 14.007,
+    "electronegativity": 3.04,
+    "atomicRadius": 56.0,
+    "ionizationEnergy": 1402.0,
+    "meltingPoint": 63.15,
+    "boilingPoint": 77.36,
+    "state": "气态",
+    "category": "nonmetal"
+  },
+  {
+    "number": 8,
+    "symbol": "O",
+    "name": "氧",
+    "atomicMass": 15.999,
+    "electronegativity": 3.44,
+    "atomicRadius": 48.0,
+    "ionizationEnergy": 1314.0,
+    "meltingPoint": 54.36,
+    "boilingPoint": 90.2,
+    "state": "气态",
+    "category": "nonmetal"
+  },
+  {
+    "number": 9,
+    "symbol": "F",
+    "name": "氟",
+    "atomicMass": 18.998,
+    "electronegativity": 3.98,
+    "atomicRadius": 42.0,
+    "ionizationEnergy": 1681.0,
+    "meltingPoint": 53.48,
+    "boilingPoint": 85.03,
+    "state": "气态",
+    "category": "halogen"
+  },
+  {
+    "number": 10,
+    "symbol": "Ne",
+    "name": "氖",
+    "atomicMass": 20.18,
+    "electronegativity": null,
+    "atomicRadius": 38.0,
+    "ionizationEnergy": 2080.0,
+    "meltingPoint": 24.56,
+    "boilingPoint": 27.07,
+    "state": "气态",
+    "category": "noble-gas"
+  },
+  {
+    "number": 11,
+    "symbol": "Na",
+    "name": "钠",
+    "atomicMass": 22.99,
+    "electronegativity": 0.93,
+    "atomicRadius": 190.0,
+    "ionizationEnergy": 496.0,
+    "meltingPoint": 370.87,
+    "boilingPoint": 1156.0,
+    "state": "固态",
+    "category": "alkali"
+  },
+  {
+    "number": 12,
+    "symbol": "Mg",
+    "name": "镁",
+    "atomicMass": 24.305,
+    "electronegativity": 1.31,
+    "atomicRadius": 145.0,
+    "ionizationEnergy": 738.0,
+    "meltingPoint": 923.0,
+    "boilingPoint": 1363.0,
+    "state": "固态",
+    "category": "alkaline"
+  },
+  {
+    "number": 13,
+    "symbol": "Al",
+    "name": "铝",
+    "atomicMass": 26.982,
+    "electronegativity": 1.61,
+    "atomicRadius": 118.0,
+    "ionizationEnergy": 578.0,
+    "meltingPoint": 933.47,
+    "boilingPoint": 2792.0,
+    "state": "固态",
+    "category": "post-transition"
+  },
+  {
+    "number": 14,
+    "symbol": "Si",
+    "name": "硅",
+    "atomicMass": 28.085,
+    "electronegativity": 1.9,
+    "atomicRadius": 111.0,
+    "ionizationEnergy": 786.0,
+    "meltingPoint": 1687.0,
+    "boilingPoint": 3538.0,
+    "state": "固态",
+    "category": "metalloid"
+  },
+  {
+    "number": 15,
+    "symbol": "P",
+    "name": "磷",
+    "atomicMass": 30.974,
+    "electronegativity": 2.19,
+    "atomicRadius": 98.0,
+    "ionizationEnergy": 1012.0,
+    "meltingPoint": 317.3,
+    "boilingPoint": 553.7,
+    "state": "固态",
+    "category": "nonmetal"
+  },
+  {
+    "number": 16,
+    "symbol": "S",
+    "name": "硫",
+    "atomicMass": 32.06,
+    "electronegativity": 2.58,
+    "atomicRadius": 88.0,
+    "ionizationEnergy": 999.0,
+    "meltingPoint": 388.36,
+    "boilingPoint": 717.8,
+    "state": "固态",
+    "category": "nonmetal"
+  },
+  {
+    "number": 17,
+    "symbol": "Cl",
+    "name": "氯",
+    "atomicMass": 35.45,
+    "electronegativity": 3.16,
+    "atomicRadius": 79.0,
+    "ionizationEnergy": 1251.0,
+    "meltingPoint": 171.6,
+    "boilingPoint": 239.11,
+    "state": "气态",
+    "category": "halogen"
+  },
+  {
+    "number": 18,
+    "symbol": "Ar",
+    "name": "氩",
+    "atomicMass": 39.948,
+    "electronegativity": null,
+    "atomicRadius": 71.0,
+    "ionizationEnergy": 1520.0,
+    "meltingPoint": 83.81,
+    "boilingPoint": 87.3,
+    "state": "气态",
+    "category": "noble-gas"
+  },
+  {
+    "number": 19,
+    "symbol": "K",
+    "name": "钾",
+    "atomicMass": 39.098,
+    "electronegativity": 0.82,
+    "atomicRadius": 243.0,
+    "ionizationEnergy": 419.0,
+    "meltingPoint": 336.53,
+    "boilingPoint": 1032.0,
+    "state": "固态",
+    "category": "alkali"
+  },
+  {
+    "number": 20,
+    "symbol": "Ca",
+    "name": "钙",
+    "atomicMass": 40.078,
+    "electronegativity": 1.0,
+    "atomicRadius": 194.0,
+    "ionizationEnergy": 590.0,
+    "meltingPoint": 1115.0,
+    "boilingPoint": 1757.0,
+    "state": "固态",
+    "category": "alkaline"
+  },
+  {
+    "number": 21,
+    "symbol": "Sc",
+    "name": "钪",
+    "atomicMass": 44.956,
+    "electronegativity": 1.36,
+    "atomicRadius": 184.0,
+    "ionizationEnergy": 633.0,
+    "meltingPoint": 1814.0,
+    "boilingPoint": 3103.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 22,
+    "symbol": "Ti",
+    "name": "钛",
+    "atomicMass": 47.867,
+    "electronegativity": 1.54,
+    "atomicRadius": 176.0,
+    "ionizationEnergy": 658.0,
+    "meltingPoint": 1941.0,
+    "boilingPoint": 3560.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 23,
+    "symbol": "V",
+    "name": "钒",
+    "atomicMass": 50.942,
+    "electronegativity": 1.63,
+    "atomicRadius": 171.0,
+    "ionizationEnergy": 651.0,
+    "meltingPoint": 2183.0,
+    "boilingPoint": 3680.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 24,
+    "symbol": "Cr",
+    "name": "铬",
+    "atomicMass": 51.996,
+    "electronegativity": 1.66,
+    "atomicRadius": 166.0,
+    "ionizationEnergy": 653.0,
+    "meltingPoint": 2180.0,
+    "boilingPoint": 2944.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 25,
+    "symbol": "Mn",
+    "name": "锰",
+    "atomicMass": 54.938,
+    "electronegativity": 1.55,
+    "atomicRadius": 161.0,
+    "ionizationEnergy": 717.0,
+    "meltingPoint": 1519.0,
+    "boilingPoint": 2334.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 26,
+    "symbol": "Fe",
+    "name": "铁",
+    "atomicMass": 55.845,
+    "electronegativity": 1.83,
+    "atomicRadius": 156.0,
+    "ionizationEnergy": 759.0,
+    "meltingPoint": 1811.0,
+    "boilingPoint": 3134.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 27,
+    "symbol": "Co",
+    "name": "钴",
+    "atomicMass": 58.933,
+    "electronegativity": 1.88,
+    "atomicRadius": 152.0,
+    "ionizationEnergy": 760.0,
+    "meltingPoint": 1768.0,
+    "boilingPoint": 3200.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 28,
+    "symbol": "Ni",
+    "name": "镍",
+    "atomicMass": 58.693,
+    "electronegativity": 1.91,
+    "atomicRadius": 149.0,
+    "ionizationEnergy": 737.0,
+    "meltingPoint": 1728.0,
+    "boilingPoint": 3186.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 29,
+    "symbol": "Cu",
+    "name": "铜",
+    "atomicMass": 63.546,
+    "electronegativity": 1.9,
+    "atomicRadius": 145.0,
+    "ionizationEnergy": 745.0,
+    "meltingPoint": 1357.77,
+    "boilingPoint": 2835.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 30,
+    "symbol": "Zn",
+    "name": "锌",
+    "atomicMass": 65.38,
+    "electronegativity": 1.65,
+    "atomicRadius": 142.0,
+    "ionizationEnergy": 906.0,
+    "meltingPoint": 692.68,
+    "boilingPoint": 1180.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 31,
+    "symbol": "Ga",
+    "name": "镓",
+    "atomicMass": 69.723,
+    "electronegativity": 1.81,
+    "atomicRadius": 136.0,
+    "ionizationEnergy": 579.0,
+    "meltingPoint": 302.91,
+    "boilingPoint": 2477.0,
+    "state": "固态",
+    "category": "post-transition"
+  },
+  {
+    "number": 32,
+    "symbol": "Ge",
+    "name": "锗",
+    "atomicMass": 72.63,
+    "electronegativity": 2.01,
+    "atomicRadius": 125.0,
+    "ionizationEnergy": 762.0,
+    "meltingPoint": 1211.4,
+    "boilingPoint": 3106.0,
+    "state": "固态",
+    "category": "metalloid"
+  },
+  {
+    "number": 33,
+    "symbol": "As",
+    "name": "砷",
+    "atomicMass": 74.922,
+    "electronegativity": 2.18,
+    "atomicRadius": 114.0,
+    "ionizationEnergy": 947.0,
+    "meltingPoint": 1090.0,
+    "boilingPoint": 887.0,
+    "state": "固态",
+    "category": "metalloid"
+  },
+  {
+    "number": 34,
+    "symbol": "Se",
+    "name": "硒",
+    "atomicMass": 78.971,
+    "electronegativity": 2.55,
+    "atomicRadius": 103.0,
+    "ionizationEnergy": 941.0,
+    "meltingPoint": 494.0,
+    "boilingPoint": 958.0,
+    "state": "固态",
+    "category": "nonmetal"
+  },
+  {
+    "number": 35,
+    "symbol": "Br",
+    "name": "溴",
+    "atomicMass": 79.904,
+    "electronegativity": 2.96,
+    "atomicRadius": 94.0,
+    "ionizationEnergy": 1140.0,
+    "meltingPoint": 265.8,
+    "boilingPoint": 331.9,
+    "state": "液态",
+    "category": "halogen"
+  },
+  {
+    "number": 36,
+    "symbol": "Kr",
+    "name": "氪",
+    "atomicMass": 83.798,
+    "electronegativity": null,
+    "atomicRadius": 88.0,
+    "ionizationEnergy": 1351.0,
+    "meltingPoint": 115.78,
+    "boilingPoint": 119.93,
+    "state": "气态",
+    "category": "noble-gas"
+  },
+  {
+    "number": 37,
+    "symbol": "Rb",
+    "name": "铷",
+    "atomicMass": 85.468,
+    "electronegativity": 0.82,
+    "atomicRadius": 265.0,
+    "ionizationEnergy": 403.0,
+    "meltingPoint": 312.46,
+    "boilingPoint": 961.0,
+    "state": "固态",
+    "category": "alkali"
+  },
+  {
+    "number": 38,
+    "symbol": "Sr",
+    "name": "锶",
+    "atomicMass": 87.62,
+    "electronegativity": 0.95,
+    "atomicRadius": 219.0,
+    "ionizationEnergy": 549.0,
+    "meltingPoint": 1050.0,
+    "boilingPoint": 1655.0,
+    "state": "固态",
+    "category": "alkaline"
+  },
+  {
+    "number": 39,
+    "symbol": "Y",
+    "name": "钇",
+    "atomicMass": 88.906,
+    "electronegativity": 1.22,
+    "atomicRadius": 212.0,
+    "ionizationEnergy": 600.0,
+    "meltingPoint": 1799.0,
+    "boilingPoint": 3609.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 40,
+    "symbol": "Zr",
+    "name": "锆",
+    "atomicMass": 91.224,
+    "electronegativity": 1.33,
+    "atomicRadius": 206.0,
+    "ionizationEnergy": 640.0,
+    "meltingPoint": 2128.0,
+    "boilingPoint": 4682.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 41,
+    "symbol": "Nb",
+    "name": "铌",
+    "atomicMass": 92.906,
+    "electronegativity": 1.6,
+    "atomicRadius": 198.0,
+    "ionizationEnergy": 652.0,
+    "meltingPoint": 2750.0,
+    "boilingPoint": 5017.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 42,
+    "symbol": "Mo",
+    "name": "钼",
+    "atomicMass": 95.95,
+    "electronegativity": 2.16,
+    "atomicRadius": 190.0,
+    "ionizationEnergy": 684.0,
+    "meltingPoint": 2896.0,
+    "boilingPoint": 4912.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 43,
+    "symbol": "Tc",
+    "name": "锝",
+    "atomicMass": 98.0,
+    "electronegativity": null,
+    "atomicRadius": 183.0,
+    "ionizationEnergy": 702.0,
+    "meltingPoint": 2430.0,
+    "boilingPoint": 4538.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 44,
+    "symbol": "Ru",
+    "name": "钌",
+    "atomicMass": 101.07,
+    "electronegativity": 2.2,
+    "atomicRadius": 178.0,
+    "ionizationEnergy": 710.0,
+    "meltingPoint": 2607.0,
+    "boilingPoint": 4423.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 45,
+    "symbol": "Rh",
+    "name": "铑",
+    "atomicMass": 102.91,
+    "electronegativity": 2.28,
+    "atomicRadius": 173.0,
+    "ionizationEnergy": 720.0,
+    "meltingPoint": 2237.0,
+    "boilingPoint": 3968.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 46,
+    "symbol": "Pd",
+    "name": "钯",
+    "atomicMass": 106.42,
+    "electronegativity": 2.2,
+    "atomicRadius": 169.0,
+    "ionizationEnergy": 804.0,
+    "meltingPoint": 1828.05,
+    "boilingPoint": 3236.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 47,
+    "symbol": "Ag",
+    "name": "银",
+    "atomicMass": 107.87,
+    "electronegativity": 1.93,
+    "atomicRadius": 165.0,
+    "ionizationEnergy": 731.0,
+    "meltingPoint": 1234.93,
+    "boilingPoint": 2435.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 48,
+    "symbol": "Cd",
+    "name": "镉",
+    "atomicMass": 112.41,
+    "electronegativity": 1.69,
+    "atomicRadius": 161.0,
+    "ionizationEnergy": 868.0,
+    "meltingPoint": 594.22,
+    "boilingPoint": 1040.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 49,
+    "symbol": "In",
+    "name": "铟",
+    "atomicMass": 114.82,
+    "electronegativity": 1.78,
+    "atomicRadius": 156.0,
+    "ionizationEnergy": 558.0,
+    "meltingPoint": 429.75,
+    "boilingPoint": 2345.0,
+    "state": "固态",
+    "category": "post-transition"
+  },
+  {
+    "number": 50,
+    "symbol": "Sn",
+    "name": "锡",
+    "atomicMass": 118.71,
+    "electronegativity": 1.96,
+    "atomicRadius": 145.0,
+    "ionizationEnergy": 709.0,
+    "meltingPoint": 505.08,
+    "boilingPoint": 2875.0,
+    "state": "固态",
+    "category": "post-transition"
+  },
+  {
+    "number": 51,
+    "symbol": "Sb",
+    "name": "锑",
+    "atomicMass": 121.76,
+    "electronegativity": 2.05,
+    "atomicRadius": 133.0,
+    "ionizationEnergy": 834.0,
+    "meltingPoint": 903.78,
+    "boilingPoint": 1860.0,
+    "state": "固态",
+    "category": "metalloid"
+  },
+  {
+    "number": 52,
+    "symbol": "Te",
+    "name": "碲",
+    "atomicMass": 127.6,
+    "electronegativity": 2.1,
+    "atomicRadius": 123.0,
+    "ionizationEnergy": 869.0,
+    "meltingPoint": 722.66,
+    "boilingPoint": 1261.0,
+    "state": "固态",
+    "category": "metalloid"
+  },
+  {
+    "number": 53,
+    "symbol": "I",
+    "name": "碘",
+    "atomicMass": 126.9,
+    "electronegativity": 2.66,
+    "atomicRadius": 115.0,
+    "ionizationEnergy": 1008.0,
+    "meltingPoint": 386.85,
+    "boilingPoint": 457.4,
+    "state": "固态",
+    "category": "halogen"
+  },
+  {
+    "number": 54,
+    "symbol": "Xe",
+    "name": "氙",
+    "atomicMass": 131.29,
+    "electronegativity": null,
+    "atomicRadius": 108.0,
+    "ionizationEnergy": 1170.0,
+    "meltingPoint": 161.4,
+    "boilingPoint": 165.1,
+    "state": "气态",
+    "category": "noble-gas"
+  },
+  {
+    "number": 55,
+    "symbol": "Cs",
+    "name": "铯",
+    "atomicMass": 132.91,
+    "electronegativity": 0.79,
+    "atomicRadius": 298.0,
+    "ionizationEnergy": 376.0,
+    "meltingPoint": 301.59,
+    "boilingPoint": 944.0,
+    "state": "固态",
+    "category": "alkali"
+  },
+  {
+    "number": 56,
+    "symbol": "Ba",
+    "name": "钡",
+    "atomicMass": 137.33,
+    "electronegativity": 0.89,
+    "atomicRadius": 253.0,
+    "ionizationEnergy": 503.0,
+    "meltingPoint": 1000.0,
+    "boilingPoint": 2170.0,
+    "state": "固态",
+    "category": "alkaline"
+  },
+  {
+    "number": 57,
+    "symbol": "La",
+    "name": "镧",
+    "atomicMass": 138.91,
+    "electronegativity": 1.1,
+    "atomicRadius": 240.0,
+    "ionizationEnergy": 538.0,
+    "meltingPoint": 1193.0,
+    "boilingPoint": 3737.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 58,
+    "symbol": "Ce",
+    "name": "铈",
+    "atomicMass": 140.12,
+    "electronegativity": 1.12,
+    "atomicRadius": 235.0,
+    "ionizationEnergy": 534.0,
+    "meltingPoint": 1071.0,
+    "boilingPoint": 3716.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 59,
+    "symbol": "Pr",
+    "name": "镨",
+    "atomicMass": 140.91,
+    "electronegativity": 1.13,
+    "atomicRadius": 239.0,
+    "ionizationEnergy": 527.0,
+    "meltingPoint": 1208.0,
+    "boilingPoint": 3793.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 60,
+    "symbol": "Nd",
+    "name": "钕",
+    "atomicMass": 144.24,
+    "electronegativity": 1.14,
+    "atomicRadius": 229.0,
+    "ionizationEnergy": 533.0,
+    "meltingPoint": 1297.0,
+    "boilingPoint": 3347.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 61,
+    "symbol": "Pm",
+    "name": "钷",
+    "atomicMass": 145.0,
+    "electronegativity": null,
+    "atomicRadius": 236.0,
+    "ionizationEnergy": 540.0,
+    "meltingPoint": 1315.0,
+    "boilingPoint": 3273.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 62,
+    "symbol": "Sm",
+    "name": "钐",
+    "atomicMass": 150.36,
+    "electronegativity": 1.17,
+    "atomicRadius": 229.0,
+    "ionizationEnergy": 545.0,
+    "meltingPoint": 1345.0,
+    "boilingPoint": 2067.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 63,
+    "symbol": "Eu",
+    "name": "铕",
+    "atomicMass": 151.96,
+    "electronegativity": 1.2,
+    "atomicRadius": 233.0,
+    "ionizationEnergy": 547.0,
+    "meltingPoint": 1095.0,
+    "boilingPoint": 1802.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 64,
+    "symbol": "Gd",
+    "name": "钆",
+    "atomicMass": 157.25,
+    "electronegativity": 1.2,
+    "atomicRadius": 233.0,
+    "ionizationEnergy": 593.0,
+    "meltingPoint": 1585.0,
+    "boilingPoint": 3546.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 65,
+    "symbol": "Tb",
+    "name": "铽",
+    "atomicMass": 158.93,
+    "electronegativity": 1.2,
+    "atomicRadius": 225.0,
+    "ionizationEnergy": 566.0,
+    "meltingPoint": 1629.0,
+    "boilingPoint": 3503.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 66,
+    "symbol": "Dy",
+    "name": "镝",
+    "atomicMass": 162.5,
+    "electronegativity": 1.22,
+    "atomicRadius": 228.0,
+    "ionizationEnergy": 573.0,
+    "meltingPoint": 1680.0,
+    "boilingPoint": 2840.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 67,
+    "symbol": "Ho",
+    "name": "钬",
+    "atomicMass": 164.93,
+    "electronegativity": 1.23,
+    "atomicRadius": 226.0,
+    "ionizationEnergy": 581.0,
+    "meltingPoint": 1734.0,
+    "boilingPoint": 2993.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 68,
+    "symbol": "Er",
+    "name": "铒",
+    "atomicMass": 167.26,
+    "electronegativity": 1.24,
+    "atomicRadius": 226.0,
+    "ionizationEnergy": 589.0,
+    "meltingPoint": 1802.0,
+    "boilingPoint": 3141.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 69,
+    "symbol": "Tm",
+    "name": "铥",
+    "atomicMass": 168.93,
+    "electronegativity": 1.25,
+    "atomicRadius": 222.0,
+    "ionizationEnergy": 597.0,
+    "meltingPoint": 1818.0,
+    "boilingPoint": 2223.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 70,
+    "symbol": "Yb",
+    "name": "镱",
+    "atomicMass": 173.05,
+    "electronegativity": 1.1,
+    "atomicRadius": 222.0,
+    "ionizationEnergy": 603.0,
+    "meltingPoint": 1097.0,
+    "boilingPoint": 1469.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 71,
+    "symbol": "Lu",
+    "name": "镥",
+    "atomicMass": 174.97,
+    "electronegativity": 1.27,
+    "atomicRadius": 217.0,
+    "ionizationEnergy": 524.0,
+    "meltingPoint": 1925.0,
+    "boilingPoint": 3675.0,
+    "state": "固态",
+    "category": "lanthanoid"
+  },
+  {
+    "number": 72,
+    "symbol": "Hf",
+    "name": "铪",
+    "atomicMass": 178.49,
+    "electronegativity": 1.3,
+    "atomicRadius": 208.0,
+    "ionizationEnergy": 659.0,
+    "meltingPoint": 2506.0,
+    "boilingPoint": 4876.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 73,
+    "symbol": "Ta",
+    "name": "钽",
+    "atomicMass": 180.95,
+    "electronegativity": 1.5,
+    "atomicRadius": 200.0,
+    "ionizationEnergy": 761.0,
+    "meltingPoint": 3290.0,
+    "boilingPoint": 5731.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 74,
+    "symbol": "W",
+    "name": "钨",
+    "atomicMass": 183.84,
+    "electronegativity": 2.36,
+    "atomicRadius": 193.0,
+    "ionizationEnergy": 770.0,
+    "meltingPoint": 3695.0,
+    "boilingPoint": 5828.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 75,
+    "symbol": "Re",
+    "name": "铼",
+    "atomicMass": 186.21,
+    "electronegativity": 1.9,
+    "atomicRadius": 188.0,
+    "ionizationEnergy": 760.0,
+    "meltingPoint": 3459.0,
+    "boilingPoint": 5869.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 76,
+    "symbol": "Os",
+    "name": "锇",
+    "atomicMass": 190.23,
+    "electronegativity": 2.2,
+    "atomicRadius": 185.0,
+    "ionizationEnergy": 840.0,
+    "meltingPoint": 3306.0,
+    "boilingPoint": 5285.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 77,
+    "symbol": "Ir",
+    "name": "铱",
+    "atomicMass": 192.22,
+    "electronegativity": 2.2,
+    "atomicRadius": 180.0,
+    "ionizationEnergy": 880.0,
+    "meltingPoint": 2719.0,
+    "boilingPoint": 4701.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 78,
+    "symbol": "Pt",
+    "name": "铂",
+    "atomicMass": 195.08,
+    "electronegativity": 2.28,
+    "atomicRadius": 177.0,
+    "ionizationEnergy": 871.0,
+    "meltingPoint": 2041.4,
+    "boilingPoint": 4098.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 79,
+    "symbol": "Au",
+    "name": "金",
+    "atomicMass": 196.97,
+    "electronegativity": 2.54,
+    "atomicRadius": 174.0,
+    "ionizationEnergy": 890.0,
+    "meltingPoint": 1337.33,
+    "boilingPoint": 3129.0,
+    "state": "固态",
+    "category": "transition"
+  },
+  {
+    "number": 80,
+    "symbol": "Hg",
+    "name": "汞",
+    "atomicMass": 200.59,
+    "electronegativity": 2.0,
+    "atomicRadius": 171.0,
+    "ionizationEnergy": 1007.0,
+    "meltingPoint": 234.32,
+    "boilingPoint": 629.88,
+    "state": "液态",
+    "category": "transition"
+  },
+  {
+    "number": 81,
+    "symbol": "Tl",
+    "name": "铊",
+    "atomicMass": 204.38,
+    "electronegativity": 1.62,
+    "atomicRadius": 156.0,
+    "ionizationEnergy": 589.0,
+    "meltingPoint": 577.0,
+    "boilingPoint": 1746.0,
+    "state": "固态",
+    "category": "post-transition"
+  },
+  {
+    "number": 82,
+    "symbol": "Pb",
+    "name": "铅",
+    "atomicMass": 207.2,
+    "electronegativity": 1.87,
+    "atomicRadius": 154.0,
+    "ionizationEnergy": 716.0,
+    "meltingPoint": 600.61,
+    "boilingPoint": 2022.0,
+    "state": "固态",
+    "category": "post-transition"
+  },
+  {
+    "number": 83,
+    "symbol": "Bi",
+    "name": "铋",
+    "atomicMass": 208.98,
+    "electronegativity": 2.02,
+    "atomicRadius": 143.0,
+    "ionizationEnergy": 703.0,
+    "meltingPoint": 544.55,
+    "boilingPoint": 1837.0,
+    "state": "固态",
+    "category": "post-transition"
+  },
+  {
+    "number": 84,
+    "symbol": "Po",
+    "name": "钋",
+    "atomicMass": 209.0,
+    "electronegativity": 2.0,
+    "atomicRadius": 135.0,
+    "ionizationEnergy": 812.0,
+    "meltingPoint": 527.0,
+    "boilingPoint": 1235.0,
+    "state": "固态",
+    "category": "post-transition"
+  },
+  {
+    "number": 85,
+    "symbol": "At",
+    "name": "砹",
+    "atomicMass": 210.0,
+    "electronegativity": 2.2,
+    "atomicRadius": 127.0,
+    "ionizationEnergy": 920.0,
+    "meltingPoint": 575.0,
+    "boilingPoint": 610.0,
+    "state": "固态",
+    "category": "halogen"
+  },
+  {
+    "number": 86,
+    "symbol": "Rn",
+    "name": "氡",
+    "atomicMass": 222.0,
+    "electronegativity": null,
+    "atomicRadius": 120.0,
+    "ionizationEnergy": 1037.0,
+    "meltingPoint": 202.0,
+    "boilingPoint": 211.5,
+    "state": "气态",
+    "category": "noble-gas"
+  },
+  {
+    "number": 87,
+    "symbol": "Fr",
+    "name": "钫",
+    "atomicMass": 223.0,
+    "electronegativity": 0.7,
+    "atomicRadius": 348.0,
+    "ionizationEnergy": 380.0,
+    "meltingPoint": 300.0,
+    "boilingPoint": 950.0,
+    "state": "固态",
+    "category": "alkali"
+  },
+  {
+    "number": 88,
+    "symbol": "Ra",
+    "name": "镭",
+    "atomicMass": 226.0,
+    "electronegativity": 0.9,
+    "atomicRadius": 283.0,
+    "ionizationEnergy": 509.0,
+    "meltingPoint": 973.0,
+    "boilingPoint": 2010.0,
+    "state": "固态",
+    "category": "alkaline"
+  },
+  {
+    "number": 89,
+    "symbol": "Ac",
+    "name": "锕",
+    "atomicMass": 227.0,
+    "electronegativity": 1.1,
+    "atomicRadius": 260.0,
+    "ionizationEnergy": 499.0,
+    "meltingPoint": 1500.0,
+    "boilingPoint": 3500.0,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 90,
+    "symbol": "Th",
+    "name": "钍",
+    "atomicMass": 232.04,
+    "electronegativity": 1.3,
+    "atomicRadius": 238.0,
+    "ionizationEnergy": 587.0,
+    "meltingPoint": 2023.0,
+    "boilingPoint": 5061.0,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 91,
+    "symbol": "Pa",
+    "name": "镤",
+    "atomicMass": 231.04,
+    "electronegativity": 1.5,
+    "atomicRadius": 243.0,
+    "ionizationEnergy": 568.0,
+    "meltingPoint": 1841.0,
+    "boilingPoint": 4300.0,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 92,
+    "symbol": "U",
+    "name": "铀",
+    "atomicMass": 238.03,
+    "electronegativity": 1.38,
+    "atomicRadius": 240.0,
+    "ionizationEnergy": 598.0,
+    "meltingPoint": 1405.3,
+    "boilingPoint": 4404.0,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 93,
+    "symbol": "Np",
+    "name": "镎",
+    "atomicMass": 237.0,
+    "electronegativity": 1.36,
+    "atomicRadius": 221.0,
+    "ionizationEnergy": 604.0,
+    "meltingPoint": 917.0,
+    "boilingPoint": 4175.0,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 94,
+    "symbol": "Pu",
+    "name": "钚",
+    "atomicMass": 244.0,
+    "electronegativity": 1.28,
+    "atomicRadius": 243.0,
+    "ionizationEnergy": 585.0,
+    "meltingPoint": 912.5,
+    "boilingPoint": 3505.0,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 95,
+    "symbol": "Am",
+    "name": "镅",
+    "atomicMass": 243.0,
+    "electronegativity": 1.3,
+    "atomicRadius": 244.0,
+    "ionizationEnergy": 578.0,
+    "meltingPoint": 1449.0,
+    "boilingPoint": 2880.0,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 96,
+    "symbol": "Cm",
+    "name": "锔",
+    "atomicMass": 247.0,
+    "electronegativity": 1.3,
+    "atomicRadius": 245.0,
+    "ionizationEnergy": 581.0,
+    "meltingPoint": 1613.0,
+    "boilingPoint": 3383.0,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 97,
+    "symbol": "Bk",
+    "name": "锫",
+    "atomicMass": 247.0,
+    "electronegativity": 1.3,
+    "atomicRadius": 244.0,
+    "ionizationEnergy": 601.0,
+    "meltingPoint": 1259.0,
+    "boilingPoint": 2900.0,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 98,
+    "symbol": "Cf",
+    "name": "锎",
+    "atomicMass": 251.0,
+    "electronegativity": 1.3,
+    "atomicRadius": 245.0,
+    "ionizationEnergy": 608.0,
+    "meltingPoint": 1173.0,
+    "boilingPoint": 1743.0,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 99,
+    "symbol": "Es",
+    "name": "锿",
+    "atomicMass": 252.0,
+    "electronegativity": 1.3,
+    "atomicRadius": 245.0,
+    "ionizationEnergy": 619.0,
+    "meltingPoint": 1133.0,
+    "boilingPoint": 1269.0,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 100,
+    "symbol": "Fm",
+    "name": "镄",
+    "atomicMass": 257.0,
+    "electronegativity": 1.3,
+    "atomicRadius": 245.0,
+    "ionizationEnergy": 627.0,
+    "meltingPoint": 1125.0,
+    "boilingPoint": 1260.0,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 101,
+    "symbol": "Md",
+    "name": "钔",
+    "atomicMass": 258.0,
+    "electronegativity": null,
+    "atomicRadius": 246.0,
+    "ionizationEnergy": 635.0,
+    "meltingPoint": 1100.0,
+    "boilingPoint": null,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 102,
+    "symbol": "No",
+    "name": "锘",
+    "atomicMass": 259.0,
+    "electronegativity": null,
+    "atomicRadius": 247.0,
+    "ionizationEnergy": 642.0,
+    "meltingPoint": 1100.0,
+    "boilingPoint": null,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 103,
+    "symbol": "Lr",
+    "name": "铹",
+    "atomicMass": 262.0,
+    "electronegativity": null,
+    "atomicRadius": 246.0,
+    "ionizationEnergy": 470.0,
+    "meltingPoint": 1900.0,
+    "boilingPoint": null,
+    "state": "固态",
+    "category": "actinoid"
+  },
+  {
+    "number": 104,
+    "symbol": "Rf",
+    "name": "Rutherfordium",
+    "atomicMass": 267.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "transition"
+  },
+  {
+    "number": 105,
+    "symbol": "Db",
+    "name": "Dubnium",
+    "atomicMass": 270.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "transition"
+  },
+  {
+    "number": 106,
+    "symbol": "Sg",
+    "name": "Seaborgium",
+    "atomicMass": 271.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "transition"
+  },
+  {
+    "number": 107,
+    "symbol": "Bh",
+    "name": "Bohrium",
+    "atomicMass": 270.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "transition"
+  },
+  {
+    "number": 108,
+    "symbol": "Hs",
+    "name": "Hassium",
+    "atomicMass": 277.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "transition"
+  },
+  {
+    "number": 109,
+    "symbol": "Mt",
+    "name": "Meitnerium",
+    "atomicMass": 278.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "transition"
+  },
+  {
+    "number": 110,
+    "symbol": "Ds",
+    "name": "Darmstadtium",
+    "atomicMass": 281.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "transition"
+  },
+  {
+    "number": 111,
+    "symbol": "Rg",
+    "name": "Roentgenium",
+    "atomicMass": 282.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "transition"
+  },
+  {
+    "number": 112,
+    "symbol": "Cn",
+    "name": "Copernicium",
+    "atomicMass": 285.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "transition"
+  },
+  {
+    "number": 113,
+    "symbol": "Nh",
+    "name": "Nihonium",
+    "atomicMass": 286.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "post-transition"
+  },
+  {
+    "number": 114,
+    "symbol": "Fl",
+    "name": "Flerovium",
+    "atomicMass": 289.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "post-transition"
+  },
+  {
+    "number": 115,
+    "symbol": "Mc",
+    "name": "Moscovium",
+    "atomicMass": 290.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "post-transition"
+  },
+  {
+    "number": 116,
+    "symbol": "Lv",
+    "name": "Livermorium",
+    "atomicMass": 293.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "post-transition"
+  },
+  {
+    "number": 117,
+    "symbol": "Ts",
+    "name": "Tennessine",
+    "atomicMass": 294.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "未知",
+    "category": "halogen"
+  },
+  {
+    "number": 118,
+    "symbol": "Og",
+    "name": "Oganesson",
+    "atomicMass": 294.0,
+    "electronegativity": null,
+    "atomicRadius": null,
+    "ionizationEnergy": null,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "state": "气态",
+    "category": "noble-gas"
+  }
+];
+
+    let semiconductorMaterials = [
+      {
+        name: '硅',
+        formula: 'Si',
+        aliases: ['硅', 'si', 'silicon'],
+        bandGap: { value: 1.12, type: 'indirect', temperature: '300 K' },
+        crystalStructure: '金刚石结构 (Fd3̄m)',
+        electronMobility: '≈ 1350 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 480 cm²·V⁻¹·s⁻¹',
+        applications: 'CMOS 集成电路、太阳能电池、功率器件',
+        notes: '带隙随温度降低略有增大。'
+      },
+      {
+        name: '锗',
+        formula: 'Ge',
+        aliases: ['锗', 'ge', 'germanium'],
+        bandGap: { value: 0.66, type: 'indirect', temperature: '300 K' },
+        crystalStructure: '金刚石结构 (Fd3̄m)',
+        electronMobility: '≈ 3900 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 1900 cm²·V⁻¹·s⁻¹',
+        applications: '高速探测器、红外光电器件、核辐射探测',
+        notes: '可通过应变或合金化提升带隙与性能。'
+      },
+      {
+        name: '砷化镓',
+        formula: 'GaAs',
+        aliases: ['砷化镓', 'gaas', 'gallium arsenide'],
+        bandGap: { value: 1.42, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 8500 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 400 cm²·V⁻¹·s⁻¹',
+        applications: '高速电子器件、激光二极管、高效太阳能电池',
+        notes: '直接带隙使其在光电转换方面表现出色。'
+      },
+      {
+        name: '氮化镓',
+        formula: 'GaN',
+        aliases: ['氮化镓', 'gan', 'gallium nitride'],
+        bandGap: { value: 3.4, type: 'direct', temperature: '300 K' },
+        crystalStructure: '纤锌矿结构 (P6₃mc)',
+        electronMobility: '≈ 1000 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 30 cm²·V⁻¹·s⁻¹',
+        applications: '蓝光 LED、射频功率放大器、汽车电子',
+        notes: '宽禁带半导体，具有高击穿场与耐高温特性。'
+      },
+      {
+        name: '碳化硅 (4H-SiC)',
+        formula: '4H-SiC',
+        aliases: ['碳化硅', 'sic', '4h-sic', 'silicon carbide'],
+        bandGap: { value: 3.26, type: 'indirect', temperature: '300 K' },
+        crystalStructure: '六方 4H 多型 (P6₃mc)',
+        electronMobility: '≈ 950 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 120 cm²·V⁻¹·s⁻¹',
+        applications: '高温高压功率器件、电动汽车逆变器、磨料基底',
+        notes: '热导率高，可在高温 (>600℃) 环境中稳定工作。'
+      },
+      {
+        name: '磷化铟',
+        formula: 'InP',
+        aliases: ['磷化铟', 'inp', 'indium phosphide'],
+        bandGap: { value: 1.34, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 5400 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 200 cm²·V⁻¹·s⁻¹',
+        applications: '高速光通信、量子级联激光器、深红外探测',
+        notes: '数据参考：Sze《半导体器件物理》及 Ioffe Institute 半导体数据库。'
+      },
+      {
+        name: '碲化镉',
+        formula: 'CdTe',
+        aliases: ['碲化镉', 'cdte', 'cadmium telluride'],
+        bandGap: { value: 1.5, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 1100 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 100 cm²·V⁻¹·s⁻¹',
+        applications: '薄膜太阳能电池、伽马射线与 X 射线探测',
+        notes: '与 CdS 缓冲层结合可实现高效光伏器件。'
+      },
+      {
+        name: '氧化锌',
+        formula: 'ZnO',
+        aliases: ['氧化锌', 'zno', 'zinc oxide'],
+        bandGap: { value: 3.37, type: 'direct', temperature: '300 K' },
+        crystalStructure: '纤锌矿结构 (P6₃mc)',
+        electronMobility: '≈ 200 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 5 cm²·V⁻¹·s⁻¹',
+        applications: '紫外探测、透明导电薄膜、压电器件',
+        notes: '本征呈 n 型，空穴注入与掺杂相对困难。'
+      },
+      {
+        name: '二硫化钼',
+        formula: 'MoS₂',
+        aliases: ['二硫化钼', 'mos2', 'molybdenum disulfide'],
+        bandGap: { value: 1.8, type: 'direct', temperature: '室温 (单层)' },
+        crystalStructure: '层状六方 (P6₃/mmc)',
+        electronMobility: '≈ 200 cm²·V⁻¹·s⁻¹（单层）',
+        holeMobility: '≈ 50 cm²·V⁻¹·s⁻¹（单层）',
+        applications: '二维晶体管、柔性电子、光电探测',
+        notes: '块体约为 1.2 eV 间接带隙，单层转变为直接带隙。'
+      },
+      {
+        name: '甲胺铅碘钙钛矿',
+        formula: 'MAPbI₃',
+        aliases: ['mapbi3', 'mapbi₃', '甲胺铅碘', '甲胺铅碘钙钛矿', '钙钛矿太阳能电池'],
+        bandGap: { value: 1.55, type: 'direct', temperature: '300 K' },
+        crystalStructure: '钙钛矿结构 (I4/mcm)',
+        electronMobility: '≈ 50 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 40 cm²·V⁻¹·s⁻¹',
+        applications: '钙钛矿薄膜太阳能电池、光电探测器',
+        notes: '需良好封装以抑制湿度与热导致的退化。'
+      },
+      {
+        name: '磷化镓',
+        formula: 'GaP',
+        aliases: ['磷化镓', 'gap', 'gallium phosphide'],
+        bandGap: { value: 2.26, type: 'indirect', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 110 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 35 cm²·V⁻¹·s⁻¹',
+        applications: '红黄光发光二极管、非线性光学器件',
+        notes: '间接带隙，可通过氮化调节至绿光区。数据来源：Ioffe Institute 数据库。'
+      },
+      {
+        name: '砷化铟',
+        formula: 'InAs',
+        aliases: ['砷化铟', 'inas', 'indium arsenide'],
+        bandGap: { value: 0.36, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 30000 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 500 cm²·V⁻¹·s⁻¹',
+        applications: '中红外探测、霍尔器件、高电子迁移率晶体管',
+        notes: '数据参考：Sze《半导体器件物理》。极高电子迁移率适合低噪声放大器。'
+      },
+      {
+        name: '锑化铟',
+        formula: 'InSb',
+        aliases: ['锑化铟', 'insb', 'indium antimonide'],
+        bandGap: { value: 0.17, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 77000 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 850 cm²·V⁻¹·s⁻¹',
+        applications: '超灵敏红外探测、磁场传感、低温电子学',
+        notes: '窄带隙导致本征载流子浓度高，需低温工作。数据来源：Ioffe Institute 数据库。'
+      },
+      {
+        name: '锑化镓',
+        formula: 'GaSb',
+        aliases: ['锑化镓', 'gasb', 'gallium antimonide'],
+        bandGap: { value: 0.73, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 3800 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 850 cm²·V⁻¹·s⁻¹',
+        applications: '中红外激光器、热电制冷、异质结场效应晶体管',
+        notes: '与 InAs 形成异质结构可实现高迁移率沟道。数据参考：Sze《半导体器件物理》。'
+      },
+      {
+        name: '氮化铝',
+        formula: 'AlN',
+        aliases: ['氮化铝', 'aln', 'aluminium nitride'],
+        bandGap: { value: 6.2, type: 'direct', temperature: '300 K' },
+        crystalStructure: '纤锌矿结构 (P6₃mc)',
+        electronMobility: '≈ 300 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 20 cm²·V⁻¹·s⁻¹',
+        applications: '深紫外 LED、声表面波器件、高温电子封装',
+        notes: '超宽带隙，具备优异热导率。数据参考：NIMS MatNavi 与相关文献。'
+      },
+      {
+        name: '氮化铝镓',
+        formula: 'AlGaN',
+        aliases: ['氮化铝镓', 'algan', 'aluminum gallium nitride'],
+        bandGap: { value: 4.5, type: 'direct', temperature: '300 K (x≈0.3)' },
+        crystalStructure: '纤锌矿结构 (P6₃mc)',
+        electronMobility: '≈ 900 cm²·V⁻¹·s⁻¹（二维电子气）',
+        holeMobility: '≈ 15 cm²·V⁻¹·s⁻¹',
+        applications: '高电子迁移率晶体管（HEMT）、深紫外发光器件',
+        notes: 'Al 组分可调以改变带隙与二维电子气特性。数据参考：IEEE TED 期刊。'
+      },
+      {
+        name: 'β-氧化镓',
+        formula: 'β-Ga₂O₃',
+        aliases: ['β-ga₂o₃', 'beta-ga2o3', '氧化镓', 'ga2o3'],
+        bandGap: { value: 4.8, type: 'indirect', temperature: '300 K' },
+        crystalStructure: '单斜 β 相 (C2/m)',
+        electronMobility: '≈ 250 cm²·V⁻¹·s⁻¹（外延薄膜）',
+        holeMobility: '≈ 1 cm²·V⁻¹·s⁻¹（估算）',
+        applications: '高压功率电子、深紫外探测器',
+        notes: '超宽带隙且击穿场强高达 8 MV·cm⁻¹。数据来源：APL Materials 2018, 6, 022102。'
+      },
+      {
+        name: '硒化锌',
+        formula: 'ZnSe',
+        aliases: ['硒化锌', 'znse', 'zinc selenide'],
+        bandGap: { value: 2.7, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 1000 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 40 cm²·V⁻¹·s⁻¹',
+        applications: '绿光激光器、红外光学窗口、量子点基底',
+        notes: '数据参考：CRC Handbook 与 Ioffe Institute 数据库。'
+      },
+      {
+        name: '硫化锌',
+        formula: 'ZnS',
+        aliases: ['硫化锌', 'zns', 'zinc sulfide'],
+        bandGap: { value: 3.6, type: 'direct', temperature: '300 K' },
+        crystalStructure: '闪锌矿或纤锌矿 (F4̄3m / P6₃mc)',
+        electronMobility: '≈ 250 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 15 cm²·V⁻¹·s⁻¹',
+        applications: '荧光粉、红外窗口、光电探测器',
+        notes: '宽带隙 II-VI 半导体，可通过掺杂调节发光。数据来源：Optical Materials 期刊。'
+      },
+      {
+        name: '硫化镉',
+        formula: 'CdS',
+        aliases: ['硫化镉', 'cds', 'cadmium sulfide'],
+        bandGap: { value: 2.42, type: 'direct', temperature: '300 K' },
+        crystalStructure: '纤锌矿结构 (P6₃mc)',
+        electronMobility: '≈ 350 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 50 cm²·V⁻¹·s⁻¹',
+        applications: '光导电池、薄膜太阳能电池缓冲层',
+        notes: '常与 CdTe、CuInSe₂ 等材料组成异质结。数据参考：Ioffe Institute 数据库。'
+      },
+      {
+        name: '硒化镉',
+        formula: 'CdSe',
+        aliases: ['硒化镉', 'cdse', 'cadmium selenide'],
+        bandGap: { value: 1.74, type: 'direct', temperature: '300 K' },
+        crystalStructure: '纤锌矿结构 (P6₃mc)',
+        electronMobility: '≈ 1050 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 90 cm²·V⁻¹·s⁻¹',
+        applications: '量子点发光、光伏器件、光电探测',
+        notes: '纳米晶可覆盖可见光至近红外发光。数据参考：CRC Handbook。'
+      },
+      {
+        name: '硒化铜铟',
+        formula: 'CuInSe₂',
+        aliases: ['硒化铜铟', 'cuinse2', 'cis', 'copper indium diselenide'],
+        bandGap: { value: 1.04, type: 'direct', temperature: '300 K' },
+        crystalStructure: '四方黄铜矿结构 (I4̄2d)',
+        electronMobility: '≈ 100 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 70 cm²·V⁻¹·s⁻¹',
+        applications: '薄膜太阳能电池、光伏组件',
+        notes: 'CIGS 族材料核心成员，转换效率高。数据参考：Progress in Photovoltaics。'
+      },
+      {
+        name: '硒化铜镓',
+        formula: 'CuGaSe₂',
+        aliases: ['硒化铜镓', 'cugase2', 'cgs', 'copper gallium diselenide'],
+        bandGap: { value: 1.68, type: 'direct', temperature: '300 K' },
+        crystalStructure: '四方黄铜矿结构 (I4̄2d)',
+        electronMobility: '≈ 50 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 60 cm²·V⁻¹·s⁻¹',
+        applications: '多结太阳能电池、光伏吸收层',
+        notes: '与 CuInSe₂ 形成固溶体可调带隙。数据来源：Solar Energy Materials & Solar Cells。'
+      },
+      {
+        name: '硫化铜锌锡',
+        formula: 'Cu₂ZnSnS₄',
+        aliases: ['硫化铜锌锡', 'cu2znsns4', 'czts', 'kesterite'],
+        bandGap: { value: 1.5, type: 'direct', temperature: '300 K' },
+        crystalStructure: '正四方黄铜矿结构 (I4̄)',
+        electronMobility: '≈ 40 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 10 cm²·V⁻¹·s⁻¹',
+        applications: '环保型薄膜太阳能电池',
+        notes: '全部由地球丰度元素构成，是 CdTe 与 CIGS 的绿色替代。数据参考：Advanced Energy Materials。'
+      },
+      {
+        name: '二硫化钨',
+        formula: 'WS₂',
+        aliases: ['二硫化钨', 'ws2', 'tungsten disulfide'],
+        bandGap: { value: 2.1, type: 'direct', temperature: '室温 (单层)' },
+        crystalStructure: '层状六方 (P6₃/mmc)',
+        electronMobility: '≈ 200 cm²·V⁻¹·s⁻¹（单层）',
+        holeMobility: '≈ 150 cm²·V⁻¹·s⁻¹（单层）',
+        applications: '二维光电晶体管、可饱和吸收体、柔性电子',
+        notes: '厚度从多层到单层时带隙由间接变为直接。数据参考：Nature Nanotechnology。'
+      },
+      {
+        name: '二硒化钨',
+        formula: 'WSe₂',
+        aliases: ['二硒化钨', 'wse2', 'tungsten diselenide'],
+        bandGap: { value: 1.65, type: 'direct', temperature: '室温 (单层)' },
+        crystalStructure: '层状六方 (P6₃/mmc)',
+        electronMobility: '≈ 250 cm²·V⁻¹·s⁻¹（单层）',
+        holeMobility: '≈ 200 cm²·V⁻¹·s⁻¹（单层）',
+        applications: '对称型 CMOS 兼容二维器件、光催化',
+        notes: '具备高迁移率与可调带隙，适合 2D CMOS 研究。数据参考：ACS Nano。'
+      },
+      {
+        name: '黑磷',
+        formula: 'BP',
+        aliases: ['黑磷', 'bp', 'black phosphorus', '磷烯'],
+        bandGap: { value: 0.3, type: 'direct', temperature: '300 K (体相)' },
+        crystalStructure: '正交结构 (Cmca)',
+        electronMobility: '≈ 1000 cm²·V⁻¹·s⁻¹（薄层）',
+        holeMobility: '≈ 650 cm²·V⁻¹·s⁻¹（薄层）',
+        applications: '可调中红外光电器件、光纤调制器、传感',
+        notes: '层数减少时带隙可拓展至 ~2 eV。数据参考：Nature Nanotechnology。'
+      },
+      {
+        name: '铟镓砷',
+        formula: 'In₀.₅₃Ga₀.₄₇As',
+        aliases: ['铟镓砷', 'ingaas', 'in0.53ga0.47as', '铟镓砷异质结'],
+        bandGap: { value: 0.75, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 12000 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 400 cm²·V⁻¹·s⁻¹',
+        applications: '高速光纤通信、pHEMT、短波红外探测',
+        notes: '晶格匹配 InP 衬底，适合高速光电集成。数据参考：IEEE EDL。'
+      }
+    ];
+
+    const elementBySymbol = new Map();
+    periodicElements.forEach((element) => {
+      elementBySymbol.set(element.symbol, element);
+      elementMass[element.symbol] = element.atomicMass;
+    });
+
+    const categoryLabels = {
+  "alkali": "碱金属",
+  "alkaline": "碱土金属",
+  "transition": "过渡金属",
+  "post-transition": "后过渡金属",
+  "metalloid": "类金属",
+  "nonmetal": "非金属",
+  "halogen": "卤素",
+  "noble-gas": "稀有气体",
+  "lanthanoid": "镧系元素",
+  "actinoid": "锕系元素"
+};
+    const tableLayout = [
+  [
+    1,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    2
+  ],
+  [
+    3,
+    4,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  [
+    11,
+    12,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+  ],
+  [
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36
+  ],
+  [
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54
+  ],
+  [
+    55,
+    56,
+    57,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86
+  ],
+  [
+    87,
+    88,
+    89,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118
+  ],
+  [
+    null,
+    null,
+    null,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    null
+  ],
+  [
+    null,
+    null,
+    null,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103,
+    null
+  ]
+];
+    const periodicTable = document.getElementById('periodic-table');
+    const elementInfo = document.getElementById('element-info');
+    const legendContainer = document.getElementById('category-legend');
+    let activeElementButton = null;
+
+    function buildPeriodicTable() {
+      tableLayout.forEach((row) => {
+        row.forEach((atomicNumber) => {
+          if (atomicNumber === null) {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'empty';
+            periodicTable.appendChild(placeholder);
+            return;
+          }
+          const element = periodicElements[atomicNumber - 1];
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = `element category-${element.category}`;
+          button.innerHTML = `<span class="number">${element.number}</span><strong>${element.symbol}</strong><span>${element.name}</span>`;
+          button.addEventListener('click', () => selectElement(element, button));
+          periodicTable.appendChild(button);
+        });
+      });
+    }
+
+    function renderLegend() {
+      Object.entries(categoryLabels).forEach(([key, label]) => {
+        const item = document.createElement('span');
+        item.className = `legend-item category-${key}`;
+        item.textContent = label;
+        legendContainer.appendChild(item);
+      });
+    }
+
+    function selectElement(element, button) {
+      if (activeElementButton) {
+        activeElementButton.classList.remove('selected');
+      }
+      activeElementButton = button;
+      activeElementButton.classList.add('selected');
+      renderElementInfo(element);
+    }
+
+    function escapeHtml(text) {
+      if (text === null || text === undefined) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatNumber(value, options = {}) {
+      if (value === null || value === undefined) return '—';
+      const { digits = 2, scientificLower = 0.001, scientificUpper = 1e5 } = options;
+      const absValue = Math.abs(value);
+      if (absValue !== 0 && (absValue < scientificLower || absValue >= scientificUpper)) {
+        return Number(value).toExponential(2);
+      }
+      return Number(value).toFixed(digits);
+    }
+
+    function formatTemperature(value) {
+      if (value === null || value === undefined) return '—';
+      const celsius = value - 273.15;
+      const digits = value >= 1000 ? 1 : 2;
+      return `${formatNumber(value, { digits })} K (≈ ${formatNumber(celsius, { digits })} ℃)`;
+    }
+
+    function renderElementInfo(element) {
+      const categoryLabel = categoryLabels[element.category] || element.category;
+      elementInfo.innerHTML = `
+        <h3>${element.symbol} · ${element.name}</h3>
+        <p class="element-meta">原子序数：${element.number} ｜ 分类：${categoryLabel} ｜ 常温状态：${element.state}</p>
+        <dl>
+          <dt>相对原子质量</dt><dd>${formatNumber(element.atomicMass, { digits: 3 })}</dd>
+          <dt>电负性 (Pauling)</dt><dd>${formatNumber(element.electronegativity, { digits: 2 })}</dd>
+          <dt>原子半径</dt><dd>${element.atomicRadius ? `${formatNumber(element.atomicRadius, { digits: 0 })} pm` : '—'}</dd>
+          <dt>第一电离能</dt><dd>${element.ionizationEnergy ? `${formatNumber(element.ionizationEnergy, { digits: 1 })} kJ·mol⁻¹` : '—'}</dd>
+          <dt>熔点</dt><dd>${formatTemperature(element.meltingPoint)}</dd>
+          <dt>沸点</dt><dd>${formatTemperature(element.boilingPoint)}</dd>
+        </dl>
+      `;
+    }
+
+    function parseFormula(formula) {
+      const cleaned = formula.replace(/\s+/g, '');
+      if (!cleaned) {
+        throw new Error('请输入化学式。');
+      }
+      const parts = cleaned.split(/[·.]/);
+      const composition = new Map();
+
+      parts.forEach((part) => {
+        if (!part) return;
+        let segment = part;
+        let multiplier = 1;
+        const multiplierMatch = segment.match(/^(\d+)(.*)$/);
+        if (multiplierMatch) {
+          multiplier = parseInt(multiplierMatch[1], 10);
+          segment = multiplierMatch[2];
+        }
+        const counts = parseSegment(segment);
+        counts.forEach((count, symbol) => {
+          composition.set(symbol, (composition.get(symbol) || 0) + count * multiplier);
+        });
+      });
+
+      return composition;
+    }
+
+    function parseSegment(segment) {
+      const tokens = segment.match(/([A-Z][a-z]?|\d+|[()\[\]])/g);
+      if (!tokens) {
+        throw new Error('化学式格式无效。');
+      }
+      const stack = [new Map()];
+      for (let i = 0; i < tokens.length; i += 1) {
+        const token = tokens[i];
+        if (token === '(' || token === '[') {
+          stack.push(new Map());
+        } else if (token === ')' || token === ']') {
+          if (stack.length === 1) {
+            throw new Error('检测到未匹配的括号。');
+          }
+          const group = stack.pop();
+          let multiplier = 1;
+          const next = tokens[i + 1];
+          if (next && /^\d+$/.test(next)) {
+            multiplier = parseInt(next, 10);
+            i += 1;
+          }
+          const top = stack[stack.length - 1];
+          group.forEach((count, symbol) => {
+            top.set(symbol, (top.get(symbol) || 0) + count * multiplier);
+          });
+        } else if (/^[A-Z][a-z]?$/.test(token)) {
+          let count = 1;
+          const next = tokens[i + 1];
+          if (next && /^\d+$/.test(next)) {
+            count = parseInt(next, 10);
+            i += 1;
+          }
+          const top = stack[stack.length - 1];
+          top.set(token, (top.get(token) || 0) + count);
+        } else if (/^\d+$/.test(token)) {
+          continue;
+        } else {
+          throw new Error(`无法解析的符号: ${token}`);
+        }
+      }
+      if (stack.length !== 1) {
+        throw new Error('括号未正确闭合。');
+      }
+      return stack[0];
+    }
+
+    function calculateMolarMass(formula) {
+      const composition = parseFormula(formula);
+      const missing = Array.from(composition.keys()).filter((symbol) => !elementMass[symbol]);
+      if (missing.length) {
+        throw new Error(`未识别的元素符号：${missing.join(', ')}`);
+      }
+      const sorted = Array.from(composition.entries()).sort((a, b) => {
+        const elementA = elementBySymbol.get(a[0]);
+        const elementB = elementBySymbol.get(b[0]);
+        return (elementA?.number || 999) - (elementB?.number || 999);
+      });
+      let totalMass = 0;
+      const breakdown = [];
+      sorted.forEach(([symbol, count]) => {
+        const mass = elementMass[symbol];
+        const contribution = mass * count;
+        totalMass += contribution;
+        breakdown.push({ symbol, count, mass, contribution });
+      });
+      return { molarMass: totalMass, breakdown, composition: sorted };
+    }
+
+    const semiconductorInput = document.getElementById('semiconductor-input');
+    const semiconductorFilter = document.getElementById('semiconductor-filter');
+    const semiconductorResult = document.getElementById('semiconductor-result');
+    const semiconductorList = document.getElementById('semiconductor-list');
+    const semiconductorButton = document.getElementById('semiconductor-btn');
+    const materialsProjectKeyInput = document.getElementById('materials-project-key');
+    const materialsProjectSyncButton = document.getElementById('materials-project-sync-btn');
+    const materialsProjectStatus = document.getElementById('materials-project-status');
+    const materialsProjectSyncEndpoint = '/api/materials/sync';
+    const materialsProjectDefaultStatus =
+      '请输入 Materials Project API token 以启用同步；若由服务器代理，请确认已配置凭据。密钥仅在请求期间保留于内存。';
+    let materialsProjectSyncing = false;
+
+    function updateMaterialsProjectSyncState() {
+      if (!materialsProjectKeyInput || !materialsProjectSyncButton) return;
+      const hasKey = Boolean(materialsProjectKeyInput.value.trim());
+      materialsProjectSyncButton.disabled = !hasKey || materialsProjectSyncing;
+      if (
+        !hasKey &&
+        materialsProjectStatus &&
+        materialsProjectStatus.dataset.state !== 'syncing'
+      ) {
+        materialsProjectStatus.classList.remove('error');
+        materialsProjectStatus.dataset.state = 'idle';
+        materialsProjectStatus.textContent = materialsProjectDefaultStatus;
+      }
+    }
+
+    if (materialsProjectStatus && !materialsProjectStatus.dataset.state) {
+      materialsProjectStatus.dataset.state = 'idle';
+    }
+
+    if (semiconductorList) {
+      refreshSemiconductorDatalist();
+    }
+
+    if (materialsProjectSyncButton) {
+      materialsProjectSyncButton.addEventListener('click', () => {
+        syncMaterialsProjectData();
+      });
+    }
+
+    if (materialsProjectKeyInput) {
+      materialsProjectKeyInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          syncMaterialsProjectData();
+        }
+      });
+
+      materialsProjectKeyInput.addEventListener('input', () => {
+        if (materialsProjectStatus && materialsProjectStatus.dataset.state === 'error') {
+          materialsProjectStatus.classList.remove('error');
+          materialsProjectStatus.dataset.state = 'idle';
+          materialsProjectStatus.textContent = materialsProjectDefaultStatus;
+        }
+        updateMaterialsProjectSyncState();
+      });
+
+      materialsProjectKeyInput.addEventListener('change', updateMaterialsProjectSyncState);
+      updateMaterialsProjectSyncState();
+    }
+
+    const subscriptDigits = '₀₁₂₃₄₅₆₇₈₉';
+    const normalDigits = '0123456789';
+
+    function replaceSubscriptDigits(value) {
+      return value.replace(/[₀₁₂₃₄₅₆₇₈₉]/g, (digit) => normalDigits[subscriptDigits.indexOf(digit)] || digit);
+    }
+
+    function hasMeaningfulValue(value) {
+      return value !== null && value !== undefined && value !== '' && value !== '—';
+    }
+
+    function tokenizeSemiconductorText(text) {
+      if (!text) return [];
+      return replaceSubscriptDigits(text)
+        .toLowerCase()
+        .replace(/[()（）·•]/g, ' ')
+        .replace(/[-_]/g, ' ')
+        .split(/[,，、\\/\\s]+/)
+        .map((part) => part.trim())
+        .filter(Boolean);
+    }
+
+    function normalizeForMatch(text) {
+      if (!text) return '';
+      return replaceSubscriptDigits(text)
+        .toLowerCase()
+        .replace(/[()（）·•]/g, '')
+        .replace(/[-_]/g, '')
+        .replace(/\\s+/g, '')
+        .trim();
+    }
+
+    function refreshSemiconductorDatalist() {
+      if (!semiconductorList) return;
+      semiconductorList.innerHTML = '';
+      const seen = new Set();
+      const sorted = [...semiconductorMaterials].sort((a, b) => {
+        const nameA = a.name || a.formula || '';
+        const nameB = b.name || b.formula || '';
+        return nameA.localeCompare(nameB, 'zh-Hans-CN');
+      });
+      sorted.forEach((material) => {
+        const candidates = new Set([
+          material.formula,
+          material.name,
+          ...(material.aliases || []),
+          material.mp?.materialId
+        ]);
+        candidates.forEach((alias) => {
+          if (!alias) return;
+          const normalized = normalizeForMatch(alias);
+          if (!normalized || seen.has(normalized)) return;
+          seen.add(normalized);
+          const option = document.createElement('option');
+          option.value = alias;
+          option.label = `${material.name} (${material.formula}${material.mp?.materialId ? ` · ${material.mp.materialId}` : ''})`;
+          semiconductorList.appendChild(option);
+        });
+      });
+    }
+
+    function findSemiconductor(query) {
+      if (!query) return null;
+      const normalizedQuery = normalizeForMatch(query);
+      if (!normalizedQuery) return null;
+
+      let directMatch = semiconductorMaterials.find((material) => {
+        const formulaMatch = normalizeForMatch(material.formula) === normalizedQuery;
+        const nameMatch = normalizeForMatch(material.name) === normalizedQuery;
+        const idMatch = material.mp?.materialId && normalizeForMatch(material.mp.materialId) === normalizedQuery;
+        return formulaMatch || nameMatch || idMatch;
+      });
+      if (directMatch) {
+        return directMatch;
+      }
+
+      const tokens = tokenizeSemiconductorText(query);
+      if (!tokens.length) return null;
+
+      return semiconductorMaterials.find((material) => {
+        const aliasTokens = new Set(
+          [material.formula, material.name, material.mp?.materialId, ...(material.aliases || [])]
+            .filter(Boolean)
+            .flatMap((alias) => tokenizeSemiconductorText(alias))
+        );
+        return tokens.some((token) => aliasTokens.has(token));
+      });
+    }
+
+    function getSemiconductorSuggestions(typeFilter, limit = 5) {
+      const filtered = semiconductorMaterials.filter((material) => {
+        if (!material.bandGap || material.bandGap.value === null || material.bandGap.value === undefined) {
+          return typeFilter === 'all';
+        }
+        if (typeFilter === 'all') return true;
+        return material.bandGap.type === typeFilter;
+      });
+      return filtered
+        .slice(0, limit)
+        .map((material) => `${material.name} (${material.formula})`)
+        .join('、');
+    }
+
+    function renderSemiconductorResult(material) {
+      if (!semiconductorResult) return;
+
+      const infoItems = [];
+      if (material.bandGap && typeof material.bandGap.value === 'number') {
+        const details = [];
+        if (material.bandGap.type === 'direct') {
+          details.push('直接带隙');
+        } else if (material.bandGap.type === 'indirect') {
+          details.push('间接带隙');
+        } else if (material.bandGap.type === 'unknown') {
+          details.push('带隙类型未指定');
+        }
+        if (material.bandGap.temperature) {
+          details.push(material.bandGap.temperature);
+        }
+        const suffix = details.length ? `（${details.join('，')}）` : '';
+        infoItems.push(`<dt>带隙</dt><dd>${formatNumber(material.bandGap.value, { digits: 3 })} eV${suffix}</dd>`);
+      } else {
+        infoItems.push('<dt>带隙</dt><dd>—</dd>');
+      }
+
+      if (hasMeaningfulValue(material.crystalStructure)) {
+        infoItems.push(`<dt>晶体结构</dt><dd>${escapeHtml(material.crystalStructure)}</dd>`);
+      }
+
+      if (hasMeaningfulValue(material.electronMobility)) {
+        infoItems.push(`<dt>电子迁移率</dt><dd>${escapeHtml(material.electronMobility)}</dd>`);
+      }
+
+      if (hasMeaningfulValue(material.holeMobility)) {
+        infoItems.push(`<dt>空穴迁移率</dt><dd>${escapeHtml(material.holeMobility)}</dd>`);
+      }
+
+      if (hasMeaningfulValue(material.applications)) {
+        infoItems.push(`<dt>典型应用</dt><dd>${escapeHtml(material.applications)}</dd>`);
+      }
+
+      if (!infoItems.length) {
+        infoItems.push('<dt>信息</dt><dd>暂无详细数据。</dd>');
+      }
+
+      const aliasChips = Array.from(
+        new Set([...(material.aliases || []), material.mp?.materialId].filter(Boolean))
+      )
+        .filter((alias) => normalizeForMatch(alias) !== normalizeForMatch(material.formula))
+        .map((alias) => `<span>${escapeHtml(alias)}</span>`)
+        .join('');
+
+      const aliasSection = aliasChips ? `<p class="alias-list"><strong>常用别名：</strong>${aliasChips}</p>` : '';
+
+      let mpSection = '';
+      if (material.mp) {
+        const mpDetails = [];
+        if (material.mp.materialId) {
+          const link = `https://materialsproject.org/materials/${encodeURIComponent(material.mp.materialId)}`;
+          mpDetails.push(`<dt>Materials Project ID</dt><dd><a href="${link}" target="_blank" rel="noopener">${escapeHtml(material.mp.materialId)}</a></dd>`);
+        }
+        if (material.mp.crystalSystem || material.mp.spacegroupSymbol) {
+          const parts = [];
+          if (material.mp.crystalSystem) parts.push(material.mp.crystalSystem);
+          if (material.mp.spacegroupSymbol) parts.push(`空间群 ${material.mp.spacegroupSymbol}`);
+          mpDetails.push(`<dt>晶系 / 空间群</dt><dd>${escapeHtml(parts.join('，'))}</dd>`);
+        }
+        if (typeof material.mp.energyAboveHull === 'number') {
+          mpDetails.push(`<dt>能量高于稳定相</dt><dd>${formatNumber(material.mp.energyAboveHull, { digits: 3 })} eV·atom⁻¹</dd>`);
+        }
+        if (typeof material.mp.formationEnergy === 'number') {
+          mpDetails.push(`<dt>形成能</dt><dd>${formatNumber(material.mp.formationEnergy, { digits: 3 })} eV·atom⁻¹</dd>`);
+        }
+        if (typeof material.mp.density === 'number') {
+          mpDetails.push(`<dt>密度</dt><dd>${formatNumber(material.mp.density, { digits: 3 })} g·cm⁻³</dd>`);
+        }
+        if (typeof material.mp.efermi === 'number') {
+          mpDetails.push(`<dt>费米能级</dt><dd>${formatNumber(material.mp.efermi, { digits: 3 })} eV</dd>`);
+        }
+        if (mpDetails.length) {
+          mpSection = `<div class="mp-data"><h4>Materials Project 数据</h4><dl class="semiconductor-details">${mpDetails.join('')}</dl></div>`;
+        }
+      }
+
+      semiconductorResult.innerHTML = `
+        <div class="result-title">${escapeHtml(material.name)} (${escapeHtml(material.formula)})</div>
+        <dl class="semiconductor-details">${infoItems.join('')}</dl>
+        ${aliasSection}
+        ${material.notes ? `<p class="semiconductor-note">${escapeHtml(material.notes)}</p>` : ''}
+        ${mpSection}
+      `;
+    }
+
+    function querySemiconductor() {
+      if (!semiconductorResult) return;
+      const query = semiconductorInput ? semiconductorInput.value.trim() : '';
+      const typeFilter = semiconductorFilter ? semiconductorFilter.value : 'all';
+
+      if (!query) {
+        const suggestions = getSemiconductorSuggestions(typeFilter);
+        semiconductorResult.textContent = suggestions
+          ? `输入材料名称，例如：${suggestions}`
+          : '请输入需要查询的半导体材料。';
+        return;
+      }
+
+      const material = findSemiconductor(query);
+      if (!material) {
+        const suggestions = getSemiconductorSuggestions(typeFilter);
+        semiconductorResult.textContent = suggestions
+          ? `未找到匹配材料，可尝试：${suggestions}`
+          : '未找到匹配材料，请检查输入或同步 Materials Project 数据。';
+        return;
+      }
+
+      if (
+        typeFilter !== 'all' &&
+        material.bandGap &&
+        material.bandGap.type &&
+        material.bandGap.type !== typeFilter
+      ) {
+        const gapTypeLabel =
+          material.bandGap.type === 'direct'
+            ? '直接带隙'
+            : material.bandGap.type === 'indirect'
+              ? '间接带隙'
+              : '未知类型';
+        semiconductorResult.textContent = `${material.name} (${material.formula}) 为${gapTypeLabel}材料，请调整筛选条件。`;
+        return;
+      }
+
+      renderSemiconductorResult(material);
+    }
+
+    async function syncMaterialsProjectData() {
+      if (!materialsProjectKeyInput || !materialsProjectStatus || materialsProjectSyncing) return;
+      const apiKey = materialsProjectKeyInput.value.trim();
+      if (!apiKey) {
+        materialsProjectStatus.textContent = '请先输入 Materials Project API token。';
+        materialsProjectStatus.classList.add('error');
+        materialsProjectStatus.dataset.state = 'error';
+        updateMaterialsProjectSyncState();
+        return;
+      }
+
+      materialsProjectSyncing = true;
+      materialsProjectStatus.classList.remove('error');
+      materialsProjectStatus.dataset.state = 'syncing';
+      materialsProjectStatus.textContent = '正在通过 /api/materials/sync 获取半导体数据…';
+      updateMaterialsProjectSyncState();
+
+      try {
+        const aggregated = [];
+        const pageSize = 200;
+        const maxPages = 5;
+        for (let page = 1; page <= maxPages; page += 1) {
+          const payload = await requestMaterialsProjectPage(apiKey, page, pageSize);
+          const results = Array.isArray(payload?.materials)
+            ? payload.materials
+            : Array.isArray(payload?.data)
+              ? payload.data
+              : Array.isArray(payload?.results)
+                ? payload.results
+                : [];
+          if (!results.length) {
+            if (page === 1) {
+              throw new Error('未返回数据，请检查 token 或确认代理服务可用。');
+            }
+            break;
+          }
+          aggregated.push(...results);
+          if (results.length < pageSize) {
+            break;
+          }
+        }
+
+        const mapped = aggregated.map((entry) => mapMaterialsProjectEntry(entry)).filter(Boolean);
+        if (!mapped.length) {
+          materialsProjectStatus.textContent = '未获取到符合条件的半导体数据，可尝试调整带隙或能量筛选范围。';
+          materialsProjectStatus.classList.add('error');
+          materialsProjectStatus.dataset.state = 'error';
+          return;
+        }
+
+        const { added, updated } = mergeMaterialsProjectData(mapped);
+        refreshSemiconductorDatalist();
+        materialsProjectStatus.textContent = `已同步 ${mapped.length} 条 Materials Project 记录，新增 ${added} 条，更新 ${updated} 条。`;
+        materialsProjectStatus.classList.remove('error');
+        materialsProjectStatus.dataset.state = 'success';
+      } catch (error) {
+        const reason = error?.message || error || '未知错误';
+        materialsProjectStatus.textContent = `同步失败：${reason}。请确认 API token 正确且服务器已配置 /api/materials/sync 代理。`;
+        materialsProjectStatus.classList.add('error');
+        materialsProjectStatus.dataset.state = 'error';
+        console.error(error);
+      } finally {
+        materialsProjectSyncing = false;
+        updateMaterialsProjectSyncState();
+      }
+    }
+
+    async function requestMaterialsProjectPage(apiKey, page, pageSize) {
+      const requestBody = {
+        page,
+        pageSize,
+        filters: {
+          bandGapMin: 0.05,
+          energyAboveHullMax: 0.1
+        },
+        properties: [
+          'material_id',
+          'formula_pretty',
+          'material_name',
+          'band_gap',
+          'is_gap_direct',
+          'spacegroup',
+          'crystal_system',
+          'density',
+          'energy_above_hull',
+          'formation_energy_per_atom',
+          'efermi'
+        ],
+        sort: { field: 'band_gap', order: 'asc' }
+      };
+      if (apiKey) {
+        requestBody.apiKey = apiKey;
+      }
+
+      const response = await fetch(materialsProjectSyncEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `HTTP ${response.status}`);
+      }
+      const payload = await response.json().catch(() => {
+        throw new Error('无法解析 Materials Project 代理返回的数据。');
+      });
+      return payload;
+    }
+
+    function mapMaterialsProjectEntry(entry) {
+      if (!entry) return null;
+      const formula =
+        entry.formula_pretty ||
+        entry.formula ||
+        entry.pretty_formula ||
+        entry.chemical_formula_reduced ||
+        entry.chemical_formula;
+      if (!formula) return null;
+      const name = entry.material_name || entry.common_name || formula;
+      const bandGapField = entry.band_gap ?? entry.bandGap ?? entry.egap ?? null;
+      let bandGapValue = null;
+      if (typeof bandGapField === 'number') {
+        bandGapValue = bandGapField;
+      } else if (bandGapField && typeof bandGapField === 'object') {
+        if (typeof bandGapField.energy === 'number') bandGapValue = bandGapField.energy;
+        else if (typeof bandGapField.value === 'number') bandGapValue = bandGapField.value;
+        else if (typeof bandGapField.gap === 'number') bandGapValue = bandGapField.gap;
+        else if (typeof bandGapField.direct_gap === 'number') bandGapValue = bandGapField.direct_gap;
+      }
+      if (typeof bandGapValue !== 'number' || bandGapValue <= 0.05) {
+        return null;
+      }
+      let isDirect = entry.is_gap_direct ?? entry.is_direct ?? bandGapField?.direct ?? bandGapField?.is_direct;
+      if (typeof isDirect !== 'boolean') {
+        isDirect = null;
+      }
+      const bandGapType = isDirect === null ? 'unknown' : isDirect ? 'direct' : 'indirect';
+      const temperatureLabel =
+        bandGapField && typeof bandGapField === 'object' && typeof bandGapField.temperature === 'number'
+          ? `${bandGapField.temperature} K`
+          : 'Materials Project (DFT)';
+      const spacegroup = entry.spacegroup || {};
+      const mpData = {
+        materialId: entry.material_id || entry.materialId || null,
+        crystalSystem: spacegroup.crystal_system || entry.crystal_system || entry.crystalSystem || '',
+        spacegroupSymbol: spacegroup.symbol || entry.spacegroup_symbol || entry.spacegroupSymbol || '',
+        energyAboveHull: entry.energy_above_hull ?? entry.energyAboveHull ?? null,
+        formationEnergy: entry.formation_energy_per_atom ?? entry.formationEnergyPerAtom ?? null,
+        density: entry.density ?? null,
+        efermi: entry.efermi ?? null
+      };
+      const crystalStructure = mpData.crystalSystem || mpData.spacegroupSymbol
+        ? `${mpData.crystalSystem || ''}${mpData.spacegroupSymbol ? ` (${mpData.spacegroupSymbol})` : ''}`.trim()
+        : entry.crystal_structure || entry.symmetry || '—';
+      const aliases = Array.from(
+        new Set([formula, name, mpData.materialId, entry.material_id_short, ...(entry.elements || [])])
+      ).filter(Boolean);
+      return {
+        name,
+        formula,
+        aliases,
+        bandGap: {
+          value: Number(bandGapValue),
+          type: bandGapType,
+          temperature: temperatureLabel
+        },
+        crystalStructure,
+        electronMobility: '—',
+        holeMobility: '—',
+        applications: '—',
+        notes: '数据来源：Materials Project (DFT 计算结果)。',
+        mp: mpData
+      };
+    }
+
+    function mergeMaterialsProjectData(newMaterials) {
+      let added = 0;
+      let updated = 0;
+      const seenIds = new Set();
+      newMaterials.forEach((material) => {
+        if (!material) return;
+        const materialId = material.mp?.materialId;
+        if (materialId) {
+          const normalizedId = normalizeForMatch(materialId);
+          if (seenIds.has(normalizedId)) {
+            return;
+          }
+          seenIds.add(normalizedId);
+        }
+        const normalizedFormula = normalizeForMatch(material.formula);
+        let existing = null;
+        if (materialId) {
+          existing = semiconductorMaterials.find(
+            (item) => item.mp?.materialId && normalizeForMatch(item.mp.materialId) === normalizeForMatch(materialId)
+          );
+        }
+        if (!existing && normalizedFormula) {
+          existing = semiconductorMaterials.find(
+            (item) => normalizeForMatch(item.formula) === normalizedFormula
+          );
+        }
+        if (existing) {
+          const aliasSet = new Set([...(existing.aliases || []), ...(material.aliases || [])]);
+          existing.aliases = Array.from(aliasSet).filter(Boolean);
+          if (material.bandGap && material.bandGap.value && (!existing.bandGap || !existing.bandGap.value)) {
+            existing.bandGap = material.bandGap;
+          }
+          if (!existing.crystalStructure && material.crystalStructure) {
+            existing.crystalStructure = material.crystalStructure;
+          }
+          if (!hasMeaningfulValue(existing.electronMobility) && hasMeaningfulValue(material.electronMobility)) {
+            existing.electronMobility = material.electronMobility;
+          }
+          if (!hasMeaningfulValue(existing.holeMobility) && hasMeaningfulValue(material.holeMobility)) {
+            existing.holeMobility = material.holeMobility;
+          }
+          if (!hasMeaningfulValue(existing.applications) && hasMeaningfulValue(material.applications)) {
+            existing.applications = material.applications;
+          }
+          if (material.mp) {
+            existing.mp = material.mp;
+          }
+          if (material.notes) {
+            if (!existing.notes) {
+              existing.notes = material.notes;
+            } else if (!existing.notes.includes('Materials Project')) {
+              existing.notes += `；${material.notes}`;
+            }
+          }
+          updated += 1;
+        } else {
+          semiconductorMaterials.push(material);
+          added += 1;
+        }
+      });
+      return { added, updated };
+    }
+
+    if (semiconductorButton) {
+      semiconductorButton.addEventListener('click', querySemiconductor);
+    }
+
+    if (semiconductorInput) {
+      semiconductorInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          querySemiconductor();
+        }
+      });
+      semiconductorInput.addEventListener('change', () => {
+        if (semiconductorInput.value.trim()) {
+          querySemiconductor();
+        }
+      });
+    }
+
+    if (semiconductorFilter) {
+      semiconductorFilter.addEventListener('change', () => {
+        if (semiconductorInput && semiconductorInput.value.trim()) {
+          querySemiconductor();
+        } else if (semiconductorResult) {
+          const filter = semiconductorFilter.value;
+          const label = filter === 'direct' ? '直接带隙' : filter === 'indirect' ? '间接带隙' : '全部类型';
+          semiconductorResult.textContent = `当前筛选：${label}。输入材料名称即可查看详细数据。`;
+        }
+      });
+    }
+    document.getElementById('molar-btn').addEventListener('click', () => {
+      const formulaInput = document.getElementById('formula-input');
+      const formula = formulaInput.value.trim();
+      const output = document.getElementById('molar-result');
+      if (!formula) {
+        output.textContent = '请输入需要计算的化学式。';
+        return;
+      }
+      try {
+        const { molarMass, breakdown } = calculateMolarMass(formula);
+        const details = breakdown
+          .map((item) => `${item.symbol}<sub>${item.count}</sub>：${item.mass.toFixed(3)} × ${item.count} = ${item.contribution.toFixed(3)}`)
+          .join('<br>');
+        output.innerHTML = `相对分子质量 Mr = <strong>${molarMass.toFixed(3)}</strong> g·mol⁻¹`
+          + (breakdown.length ? `<br>组成贡献：<br>${details}` : '');
+      } catch (error) {
+        output.textContent = error.message;
+      }
+    });
+
+    document.getElementById('crystal-btn').addEventListener('click', () => {
+      const a = parseFloat(document.getElementById('lattice-a').value);
+      const h = parseInt(document.getElementById('miller-h').value, 10);
+      const k = parseInt(document.getElementById('miller-k').value, 10);
+      const l = parseInt(document.getElementById('miller-l').value, 10);
+      const output = document.getElementById('crystal-result');
+      if ([a, h, k, l].some((v) => Number.isNaN(v))) {
+        output.textContent = '请完整输入晶胞常数和米勒指数 (整数)。';
+        return;
+      }
+      const denominator = Math.sqrt(h ** 2 + k ** 2 + l ** 2);
+      if (denominator === 0) {
+        output.textContent = '米勒指数不能全部为 0。';
+        return;
+      }
+      const spacing = a / denominator;
+      output.textContent = `晶面间距 d = ${spacing.toFixed(4)} Å`;
+    });
+
+    buildPeriodicTable();
+    renderLegend();
+
+  </script>
+</body>
+</html>
