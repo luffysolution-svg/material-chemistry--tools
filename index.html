@@ -193,6 +193,43 @@
       color: var(--text);
     }
 
+    .conversion-extra {
+      margin-top: 1rem;
+      padding: 1rem 1.25rem;
+      background: #f7f9fc;
+      border-radius: 12px;
+      border: 1px solid #d7dce5;
+    }
+
+    .conversion-extra[hidden] {
+      display: none;
+    }
+
+    .info-card {
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      border: 1px solid #d7dce5;
+      background: #fff;
+      min-height: 2.75rem;
+      display: flex;
+      align-items: center;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .info-card.error {
+      border-color: #e55353;
+      color: #c0392b;
+      background: #fdecea;
+    }
+
+    .conversion-hint {
+      margin: 0.75rem 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
     .semiconductor-details {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -211,11 +248,73 @@
       font-weight: 500;
     }
 
+    .alias-list {
+      margin: 0.75rem 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .alias-list span {
+      display: inline-block;
+      margin: 0.2rem 0.35rem 0 0;
+      background: rgba(31, 60, 136, 0.08);
+      color: var(--primary);
+      padding: 0.3rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
     .semiconductor-note {
       margin-top: 0.75rem;
       color: var(--muted);
       line-height: 1.6;
       font-weight: 500;
+    }
+
+    .mp-data {
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid #e2e8f5;
+    }
+
+    .mp-data h4 {
+      margin: 0 0 0.5rem;
+      font-size: 1.05rem;
+      color: var(--primary);
+    }
+
+    .api-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .api-actions > div {
+      flex: 1 1 220px;
+    }
+
+    .api-hint {
+      margin-top: 0.75rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .api-status {
+      margin-top: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px dashed #cfd6e6;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .api-status.error {
+      border-color: #e55353;
+      color: #c0392b;
+      background: #fdecea;
     }
 
     details.reference-card {
@@ -451,6 +550,19 @@
           <select id="conversion-to"></select>
         </div>
       </div>
+      <div id="conversion-chemical-section" class="conversion-extra" hidden>
+        <div class="grid two-column">
+          <div>
+            <label for="conversion-formula">输入化学式以关联摩尔质量</label>
+            <input type="text" id="conversion-formula" placeholder="例如：H2SO4 或 CuSO4·5H2O" autocomplete="off" />
+          </div>
+          <div>
+            <label>摩尔质量 (g·mol⁻¹)</label>
+            <div id="conversion-molar-display" class="info-card" role="status" aria-live="polite">输入化学式后自动计算</div>
+          </div>
+        </div>
+        <p id="conversion-formula-hint" class="conversion-hint">可输入含括号、带结晶水的化学式，系统会自动解析并用于质量与物质的量之间的换算。</p>
+      </div>
       <button id="convert-btn" style="margin-top: 1rem; padding-inline: 2rem;">开始换算</button>
       <div id="conversion-result" class="result" aria-live="polite"></div>
     </section>
@@ -568,6 +680,21 @@
       </div>
       <button id="semiconductor-btn" style="margin-top: 1rem; padding-inline: 2rem;">获取材料信息</button>
       <div id="semiconductor-result" class="result" aria-live="polite"></div>
+      <details class="reference-card">
+        <summary>Materials Project 数据同步</summary>
+        <div class="api-actions">
+          <div>
+            <label for="materials-project-key">API Key</label>
+            <input type="password" id="materials-project-key" value="ctx7sk-69a779e2-0d39-4fdd-bbbe-2697f6a1bf73" autocomplete="off" />
+          </div>
+          <div>
+            <label for="materials-project-sync-btn">&nbsp;</label>
+            <button type="button" id="materials-project-sync-btn" style="width: 100%;">同步半导体数据</button>
+          </div>
+        </div>
+        <p class="api-hint">使用 Materials Project API 实时扩充半导体材料库，默认筛选带隙 &gt; 0.05 eV 且能量高于稳定相不超过 0.1 eV 的材料。确保网络可访问后点击同步按钮。</p>
+        <div id="materials-project-status" class="api-status" aria-live="polite">尚未同步，保持网络通畅后点击“同步半导体数据”。</div>
+      </details>
       <details class="reference-card">
         <summary>常见半导体带隙参考</summary>
         <p>数据以室温下典型值为主，实际数值会随温度、应力和成分变化略有偏差。</p>
@@ -694,16 +821,58 @@
       }
     };
 
+    const MASS_AMOUNT_CATEGORY_KEY = '质量-物质的量';
+    const massAmountUnits = {
+      '千克 (kg)': { type: 'mass', factor: 1000 },
+      '克 (g)': { type: 'mass', factor: 1 },
+      '毫克 (mg)': { type: 'mass', factor: 1e-3 },
+      '微克 (μg)': { type: 'mass', factor: 1e-6 },
+      '摩尔 (mol)': { type: 'amount', factor: 1 },
+      '毫摩尔 (mmol)': { type: 'amount', factor: 1e-3 },
+      '微摩尔 (μmol)': { type: 'amount', factor: 1e-6 }
+    };
+
     const categorySelect = document.getElementById('conversion-category');
     const fromSelect = document.getElementById('conversion-from');
     const toSelect = document.getElementById('conversion-to');
     const valueInput = document.getElementById('conversion-value');
     const resultDiv = document.getElementById('conversion-result');
+    const conversionFormulaSection = document.getElementById('conversion-chemical-section');
+    const conversionFormulaInput = document.getElementById('conversion-formula');
+    const conversionMolarDisplay = document.getElementById('conversion-molar-display');
+    let conversionMolarMass = null;
+
+    const conversionCategories = [...Object.keys(conversions), MASS_AMOUNT_CATEGORY_KEY];
 
     function populateUnits(category) {
       fromSelect.innerHTML = '';
       toSelect.innerHTML = '';
+
+      if (category === MASS_AMOUNT_CATEGORY_KEY) {
+        Object.keys(massAmountUnits).forEach((unit) => {
+          const optionFrom = document.createElement('option');
+          optionFrom.value = unit;
+          optionFrom.textContent = unit;
+          fromSelect.appendChild(optionFrom);
+
+          const optionTo = document.createElement('option');
+          optionTo.value = unit;
+          optionTo.textContent = unit;
+          toSelect.appendChild(optionTo);
+        });
+        if (fromSelect.querySelector('option[value="克 (g)"]')) {
+          fromSelect.value = '克 (g)';
+        }
+        if (toSelect.querySelector('option[value="摩尔 (mol)"]')) {
+          toSelect.value = '摩尔 (mol)';
+        } else if (toSelect.options.length > 1) {
+          toSelect.selectedIndex = 1;
+        }
+        return;
+      }
+
       const units = conversions[category];
+      if (!units) return;
       Object.keys(units).forEach((unit) => {
         const optionFrom = document.createElement('option');
         optionFrom.value = unit;
@@ -715,28 +884,166 @@
         optionTo.textContent = unit;
         toSelect.appendChild(optionTo);
       });
-      toSelect.selectedIndex = 1;
+      if (toSelect.options.length > 1) {
+        toSelect.selectedIndex = 1;
+      }
     }
 
-    Object.keys(conversions).forEach((category) => {
+    conversionCategories.forEach((category, index) => {
       const option = document.createElement('option');
       option.value = category;
       option.textContent = category;
+      if (index === 0) {
+        option.selected = true;
+      }
       categorySelect.appendChild(option);
     });
 
-    categorySelect.addEventListener('change', () => populateUnits(categorySelect.value));
-    populateUnits(categorySelect.value || Object.keys(conversions)[0]);
+    function updateConversionMolarInfo() {
+      if (!conversionFormulaInput || !conversionMolarDisplay) return;
+      const formula = conversionFormulaInput.value.trim();
+      if (!formula) {
+        conversionMolarMass = null;
+        conversionMolarDisplay.textContent = '输入化学式后自动计算';
+        conversionMolarDisplay.classList.remove('error');
+        return;
+      }
+      try {
+        const { molarMass } = calculateMolarMass(formula);
+        conversionMolarMass = molarMass;
+        conversionMolarDisplay.textContent = `${formatNumber(molarMass, { digits: 3 })} g·mol⁻¹`;
+        conversionMolarDisplay.classList.remove('error');
+      } catch (error) {
+        conversionMolarMass = null;
+        conversionMolarDisplay.textContent = error.message;
+        conversionMolarDisplay.classList.add('error');
+      }
+    }
+
+    function toggleConversionFormulaSection(category) {
+      if (!conversionFormulaSection) return;
+      const show = category === MASS_AMOUNT_CATEGORY_KEY;
+      conversionFormulaSection.hidden = !show;
+      if (!show) {
+        conversionMolarMass = null;
+        if (conversionFormulaInput) {
+          conversionFormulaInput.value = '';
+        }
+        if (conversionMolarDisplay) {
+          conversionMolarDisplay.textContent = '输入化学式后自动计算';
+          conversionMolarDisplay.classList.remove('error');
+        }
+      } else if (conversionFormulaInput && conversionFormulaInput.value.trim()) {
+        updateConversionMolarInfo();
+      }
+    }
+
+    if (conversionFormulaInput) {
+      conversionFormulaInput.addEventListener('input', updateConversionMolarInfo);
+      conversionFormulaInput.addEventListener('change', updateConversionMolarInfo);
+    }
+
+    const initialCategory = categorySelect.value || conversionCategories[0];
+    populateUnits(initialCategory);
+    toggleConversionFormulaSection(initialCategory);
+
+    categorySelect.addEventListener('change', () => {
+      const category = categorySelect.value;
+      populateUnits(category);
+      toggleConversionFormulaSection(category);
+    });
 
     document.getElementById('convert-btn').addEventListener('click', () => {
       const category = categorySelect.value;
-      const units = conversions[category];
       const fromUnit = fromSelect.value;
       const toUnit = toSelect.value;
       const value = parseFloat(valueInput.value);
 
       if (Number.isNaN(value)) {
         resultDiv.textContent = '请输入需要换算的数值。';
+        return;
+      }
+
+      if (category === MASS_AMOUNT_CATEGORY_KEY) {
+        const fromMeta = massAmountUnits[fromUnit];
+        const toMeta = massAmountUnits[toUnit];
+        if (!fromMeta || !toMeta) {
+          resultDiv.textContent = '请选择有效的单位。';
+          return;
+        }
+
+        const crossType = fromMeta.type !== toMeta.type;
+        let molarMassValue = conversionMolarMass;
+        const formula = conversionFormulaInput ? conversionFormulaInput.value.trim() : '';
+
+        if (crossType) {
+          if (!formula) {
+            resultDiv.textContent = '请输入物质的化学式，以便在质量与物质的量之间转换。';
+            return;
+          }
+          try {
+            const { molarMass } = calculateMolarMass(formula);
+            molarMassValue = molarMass;
+            conversionMolarMass = molarMass;
+            if (conversionMolarDisplay) {
+              conversionMolarDisplay.textContent = `${formatNumber(molarMass, { digits: 3 })} g·mol⁻¹`;
+              conversionMolarDisplay.classList.remove('error');
+            }
+          } catch (error) {
+            resultDiv.textContent = error.message;
+            if (conversionMolarDisplay) {
+              conversionMolarDisplay.textContent = error.message;
+              conversionMolarDisplay.classList.add('error');
+            }
+            return;
+          }
+        }
+
+        const digits = Math.abs(value) < 1 ? 6 : 4;
+
+        if (fromMeta.type === 'mass' && toMeta.type === 'mass') {
+          const baseMass = value * fromMeta.factor;
+          const converted = baseMass / toMeta.factor;
+          resultDiv.textContent = `${value} ${fromUnit} = ${formatNumber(converted, { digits })} ${toUnit}`;
+          return;
+        }
+
+        if (fromMeta.type === 'amount' && toMeta.type === 'amount') {
+          const baseAmount = value * fromMeta.factor;
+          const converted = baseAmount / toMeta.factor;
+          resultDiv.textContent = `${value} ${fromUnit} = ${formatNumber(converted, { digits })} ${toUnit}`;
+          return;
+        }
+
+        if (!molarMassValue) {
+          resultDiv.textContent = '请先输入有效的化学式以计算摩尔质量。';
+          return;
+        }
+
+        const safeFormula = escapeHtml(formula || '目标物质');
+        if (fromMeta.type === 'mass' && toMeta.type === 'amount') {
+          const massInGrams = value * fromMeta.factor;
+          const amountInMol = massInGrams / molarMassValue;
+          const converted = amountInMol / toMeta.factor;
+          resultDiv.innerHTML = `${value} ${fromUnit} = ${formatNumber(converted, { digits })} ${toUnit}<br>所用物质：<strong>${safeFormula}</strong>，摩尔质量 M = ${formatNumber(molarMassValue, { digits: 3 })} g·mol⁻¹`;
+          return;
+        }
+
+        if (fromMeta.type === 'amount' && toMeta.type === 'mass') {
+          const amountInMol = value * fromMeta.factor;
+          const massInGrams = amountInMol * molarMassValue;
+          const converted = massInGrams / toMeta.factor;
+          resultDiv.innerHTML = `${value} ${fromUnit} = ${formatNumber(converted, { digits })} ${toUnit}<br>所用物质：<strong>${safeFormula}</strong>，摩尔质量 M = ${formatNumber(molarMassValue, { digits: 3 })} g·mol⁻¹`;
+          return;
+        }
+
+        resultDiv.textContent = '暂不支持该组合的换算。';
+        return;
+      }
+
+      const units = conversions[category];
+      if (!units || units[fromUnit] === undefined || units[toUnit] === undefined) {
+        resultDiv.textContent = '请选择有效的换算类型与单位。';
         return;
       }
 
@@ -2359,7 +2666,7 @@
   }
 ];
 
-    const semiconductorMaterials = [
+    let semiconductorMaterials = [
       {
         name: '硅',
         formula: 'Si',
@@ -2715,6 +3022,16 @@
       renderElementInfo(element);
     }
 
+    function escapeHtml(text) {
+      if (text === null || text === undefined) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function formatNumber(value, options = {}) {
       if (value === null || value === undefined) return '—';
       const { digits = 2, scientificLower = 0.001, scientificUpper = 1e5 } = options;
@@ -2820,69 +3137,260 @@
       return stack[0];
     }
 
+    function calculateMolarMass(formula) {
+      const composition = parseFormula(formula);
+      const missing = Array.from(composition.keys()).filter((symbol) => !elementMass[symbol]);
+      if (missing.length) {
+        throw new Error(`未识别的元素符号：${missing.join(', ')}`);
+      }
+      const sorted = Array.from(composition.entries()).sort((a, b) => {
+        const elementA = elementBySymbol.get(a[0]);
+        const elementB = elementBySymbol.get(b[0]);
+        return (elementA?.number || 999) - (elementB?.number || 999);
+      });
+      let totalMass = 0;
+      const breakdown = [];
+      sorted.forEach(([symbol, count]) => {
+        const mass = elementMass[symbol];
+        const contribution = mass * count;
+        totalMass += contribution;
+        breakdown.push({ symbol, count, mass, contribution });
+      });
+      return { molarMass: totalMass, breakdown, composition: sorted };
+    }
+
     const semiconductorInput = document.getElementById('semiconductor-input');
     const semiconductorFilter = document.getElementById('semiconductor-filter');
     const semiconductorResult = document.getElementById('semiconductor-result');
     const semiconductorList = document.getElementById('semiconductor-list');
     const semiconductorButton = document.getElementById('semiconductor-btn');
+    const materialsProjectKeyInput = document.getElementById('materials-project-key');
+    const materialsProjectSyncButton = document.getElementById('materials-project-sync-btn');
+    const materialsProjectStatus = document.getElementById('materials-project-status');
+    const defaultMaterialsProjectApiKey = 'ctx7sk-69a779e2-0d39-4fdd-bbbe-2697f6a1bf73';
+    const materialsProjectEndpoint = 'https://api.materialsproject.org/materials/summary/';
+    let materialsProjectSyncing = false;
+
+    if (materialsProjectKeyInput && !materialsProjectKeyInput.value) {
+      materialsProjectKeyInput.value = defaultMaterialsProjectApiKey;
+    }
 
     if (semiconductorList) {
-      semiconductorMaterials.forEach((material) => {
-        const option = document.createElement('option');
-        option.value = `${material.name} (${material.formula})`;
-        semiconductorList.appendChild(option);
+      refreshSemiconductorDatalist();
+    }
+
+    if (materialsProjectSyncButton) {
+      materialsProjectSyncButton.addEventListener('click', () => {
+        syncMaterialsProjectData();
       });
     }
 
-    const tokenizeSemiconductorText = (text) => {
+    if (materialsProjectKeyInput) {
+      materialsProjectKeyInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          syncMaterialsProjectData();
+        }
+      });
+    }
+
+    const subscriptDigits = '₀₁₂₃₄₅₆₇₈₉';
+    const normalDigits = '0123456789';
+
+    function replaceSubscriptDigits(value) {
+      return value.replace(/[₀₁₂₃₄₅₆₇₈₉]/g, (digit) => normalDigits[subscriptDigits.indexOf(digit)] || digit);
+    }
+
+    function hasMeaningfulValue(value) {
+      return value !== null && value !== undefined && value !== '' && value !== '—';
+    }
+
+    function tokenizeSemiconductorText(text) {
       if (!text) return [];
-      return text
+      return replaceSubscriptDigits(text)
         .toLowerCase()
-        .replace(/[₀₁₂₃₄₅₆₇₈₉]/g, (digit) => '0123456789'['₀₁₂₃₄₅₆₇₈₉'.indexOf(digit)])
-        .replace(/[()（）·]/g, ' ')
-        .split(/[,，、\/\s]+/)
+        .replace(/[()（）·•]/g, ' ')
+        .replace(/[-_]/g, ' ')
+        .split(/[,，、\\/\\s]+/)
         .map((part) => part.trim())
         .filter(Boolean);
-    };
+    }
 
-    const findSemiconductor = (query) => {
+    function normalizeForMatch(text) {
+      if (!text) return '';
+      return replaceSubscriptDigits(text)
+        .toLowerCase()
+        .replace(/[()（）·•]/g, '')
+        .replace(/[-_]/g, '')
+        .replace(/\\s+/g, '')
+        .trim();
+    }
+
+    function refreshSemiconductorDatalist() {
+      if (!semiconductorList) return;
+      semiconductorList.innerHTML = '';
+      const seen = new Set();
+      const sorted = [...semiconductorMaterials].sort((a, b) => {
+        const nameA = a.name || a.formula || '';
+        const nameB = b.name || b.formula || '';
+        return nameA.localeCompare(nameB, 'zh-Hans-CN');
+      });
+      sorted.forEach((material) => {
+        const candidates = new Set([
+          material.formula,
+          material.name,
+          ...(material.aliases || []),
+          material.mp?.materialId
+        ]);
+        candidates.forEach((alias) => {
+          if (!alias) return;
+          const normalized = normalizeForMatch(alias);
+          if (!normalized || seen.has(normalized)) return;
+          seen.add(normalized);
+          const option = document.createElement('option');
+          option.value = alias;
+          option.label = `${material.name} (${material.formula}${material.mp?.materialId ? ` · ${material.mp.materialId}` : ''})`;
+          semiconductorList.appendChild(option);
+        });
+      });
+    }
+
+    function findSemiconductor(query) {
+      if (!query) return null;
+      const normalizedQuery = normalizeForMatch(query);
+      if (!normalizedQuery) return null;
+
+      let directMatch = semiconductorMaterials.find((material) => {
+        const formulaMatch = normalizeForMatch(material.formula) === normalizedQuery;
+        const nameMatch = normalizeForMatch(material.name) === normalizedQuery;
+        const idMatch = material.mp?.materialId && normalizeForMatch(material.mp.materialId) === normalizedQuery;
+        return formulaMatch || nameMatch || idMatch;
+      });
+      if (directMatch) {
+        return directMatch;
+      }
+
       const tokens = tokenizeSemiconductorText(query);
       if (!tokens.length) return null;
+
       return semiconductorMaterials.find((material) => {
         const aliasTokens = new Set(
-          material.aliases.flatMap((alias) => tokenizeSemiconductorText(alias))
+          [material.formula, material.name, material.mp?.materialId, ...(material.aliases || [])]
+            .filter(Boolean)
+            .flatMap((alias) => tokenizeSemiconductorText(alias))
         );
         return tokens.some((token) => aliasTokens.has(token));
       });
-    };
+    }
 
-    const getSemiconductorSuggestions = (typeFilter, limit = 5) =>
-      semiconductorMaterials
-        .filter((material) => typeFilter === 'all' || material.bandGap.type === typeFilter)
+    function getSemiconductorSuggestions(typeFilter, limit = 5) {
+      const filtered = semiconductorMaterials.filter((material) => {
+        if (!material.bandGap || material.bandGap.value === null || material.bandGap.value === undefined) {
+          return typeFilter === 'all';
+        }
+        if (typeFilter === 'all') return true;
+        return material.bandGap.type === typeFilter;
+      });
+      return filtered
         .slice(0, limit)
         .map((material) => `${material.name} (${material.formula})`)
         .join('、');
+    }
 
-    const renderSemiconductorResult = (material) => {
+    function renderSemiconductorResult(material) {
       if (!semiconductorResult) return;
-      const typeLabel = material.bandGap.type === 'direct' ? '直接' : '间接';
-      semiconductorResult.innerHTML = `
-        <div class="result-title">${material.name} (${material.formula})</div>
-        <dl class="semiconductor-details">
-          <dt>带隙</dt><dd>${material.bandGap.value} eV（${typeLabel}，${material.bandGap.temperature}）</dd>
-          <dt>晶体结构</dt><dd>${material.crystalStructure}</dd>
-          <dt>电子迁移率</dt><dd>${material.electronMobility}</dd>
-          <dt>空穴迁移率</dt><dd>${material.holeMobility}</dd>
-          <dt>主要应用</dt><dd>${material.applications}</dd>
-        </dl>
-        ${material.notes ? `<p class="semiconductor-note">备注：${material.notes}</p>` : ''}
-      `;
-    };
 
-    const querySemiconductor = () => {
-      if (!semiconductorResult || !semiconductorInput || !semiconductorFilter) return;
-      const query = semiconductorInput.value.trim();
-      const typeFilter = semiconductorFilter.value;
+      const infoItems = [];
+      if (material.bandGap && typeof material.bandGap.value === 'number') {
+        const details = [];
+        if (material.bandGap.type === 'direct') {
+          details.push('直接带隙');
+        } else if (material.bandGap.type === 'indirect') {
+          details.push('间接带隙');
+        } else if (material.bandGap.type === 'unknown') {
+          details.push('带隙类型未指定');
+        }
+        if (material.bandGap.temperature) {
+          details.push(material.bandGap.temperature);
+        }
+        const suffix = details.length ? `（${details.join('，')}）` : '';
+        infoItems.push(`<dt>带隙</dt><dd>${formatNumber(material.bandGap.value, { digits: 3 })} eV${suffix}</dd>`);
+      } else {
+        infoItems.push('<dt>带隙</dt><dd>—</dd>');
+      }
+
+      if (hasMeaningfulValue(material.crystalStructure)) {
+        infoItems.push(`<dt>晶体结构</dt><dd>${escapeHtml(material.crystalStructure)}</dd>`);
+      }
+
+      if (hasMeaningfulValue(material.electronMobility)) {
+        infoItems.push(`<dt>电子迁移率</dt><dd>${escapeHtml(material.electronMobility)}</dd>`);
+      }
+
+      if (hasMeaningfulValue(material.holeMobility)) {
+        infoItems.push(`<dt>空穴迁移率</dt><dd>${escapeHtml(material.holeMobility)}</dd>`);
+      }
+
+      if (hasMeaningfulValue(material.applications)) {
+        infoItems.push(`<dt>典型应用</dt><dd>${escapeHtml(material.applications)}</dd>`);
+      }
+
+      if (!infoItems.length) {
+        infoItems.push('<dt>信息</dt><dd>暂无详细数据。</dd>');
+      }
+
+      const aliasChips = Array.from(
+        new Set([...(material.aliases || []), material.mp?.materialId].filter(Boolean))
+      )
+        .filter((alias) => normalizeForMatch(alias) !== normalizeForMatch(material.formula))
+        .map((alias) => `<span>${escapeHtml(alias)}</span>`)
+        .join('');
+
+      const aliasSection = aliasChips ? `<p class="alias-list"><strong>常用别名：</strong>${aliasChips}</p>` : '';
+
+      let mpSection = '';
+      if (material.mp) {
+        const mpDetails = [];
+        if (material.mp.materialId) {
+          const link = `https://materialsproject.org/materials/${encodeURIComponent(material.mp.materialId)}`;
+          mpDetails.push(`<dt>Materials Project ID</dt><dd><a href="${link}" target="_blank" rel="noopener">${escapeHtml(material.mp.materialId)}</a></dd>`);
+        }
+        if (material.mp.crystalSystem || material.mp.spacegroupSymbol) {
+          const parts = [];
+          if (material.mp.crystalSystem) parts.push(material.mp.crystalSystem);
+          if (material.mp.spacegroupSymbol) parts.push(`空间群 ${material.mp.spacegroupSymbol}`);
+          mpDetails.push(`<dt>晶系 / 空间群</dt><dd>${escapeHtml(parts.join('，'))}</dd>`);
+        }
+        if (typeof material.mp.energyAboveHull === 'number') {
+          mpDetails.push(`<dt>能量高于稳定相</dt><dd>${formatNumber(material.mp.energyAboveHull, { digits: 3 })} eV·atom⁻¹</dd>`);
+        }
+        if (typeof material.mp.formationEnergy === 'number') {
+          mpDetails.push(`<dt>形成能</dt><dd>${formatNumber(material.mp.formationEnergy, { digits: 3 })} eV·atom⁻¹</dd>`);
+        }
+        if (typeof material.mp.density === 'number') {
+          mpDetails.push(`<dt>密度</dt><dd>${formatNumber(material.mp.density, { digits: 3 })} g·cm⁻³</dd>`);
+        }
+        if (typeof material.mp.efermi === 'number') {
+          mpDetails.push(`<dt>费米能级</dt><dd>${formatNumber(material.mp.efermi, { digits: 3 })} eV</dd>`);
+        }
+        if (mpDetails.length) {
+          mpSection = `<div class="mp-data"><h4>Materials Project 数据</h4><dl class="semiconductor-details">${mpDetails.join('')}</dl></div>`;
+        }
+      }
+
+      semiconductorResult.innerHTML = `
+        <div class="result-title">${escapeHtml(material.name)} (${escapeHtml(material.formula)})</div>
+        <dl class="semiconductor-details">${infoItems.join('')}</dl>
+        ${aliasSection}
+        ${material.notes ? `<p class="semiconductor-note">${escapeHtml(material.notes)}</p>` : ''}
+        ${mpSection}
+      `;
+    }
+
+    function querySemiconductor() {
+      if (!semiconductorResult) return;
+      const query = semiconductorInput ? semiconductorInput.value.trim() : '';
+      const typeFilter = semiconductorFilter ? semiconductorFilter.value : 'all';
 
       if (!query) {
         const suggestions = getSemiconductorSuggestions(typeFilter);
@@ -2897,21 +3405,254 @@
         const suggestions = getSemiconductorSuggestions(typeFilter);
         semiconductorResult.textContent = suggestions
           ? `未找到匹配材料，可尝试：${suggestions}`
-          : '未找到匹配材料，请检查输入。';
+          : '未找到匹配材料，请检查输入或同步 Materials Project 数据。';
         return;
       }
 
-      if (typeFilter !== 'all' && material.bandGap.type !== typeFilter) {
-        const typeLabel = material.bandGap.type === 'direct' ? '直接' : '间接';
-        semiconductorResult.textContent = `${material.name} (${material.formula}) 为${typeLabel}带隙材料，请调整筛选条件。`;
+      if (
+        typeFilter !== 'all' &&
+        material.bandGap &&
+        material.bandGap.type &&
+        material.bandGap.type !== typeFilter
+      ) {
+        const gapTypeLabel =
+          material.bandGap.type === 'direct'
+            ? '直接带隙'
+            : material.bandGap.type === 'indirect'
+              ? '间接带隙'
+              : '未知类型';
+        semiconductorResult.textContent = `${material.name} (${material.formula}) 为${gapTypeLabel}材料，请调整筛选条件。`;
         return;
       }
 
       renderSemiconductorResult(material);
-    };
+    }
 
-    if (semiconductorResult) {
-      semiconductorResult.textContent = '输入材料名称即可查看带隙、晶体结构及迁移率等信息。';
+    async function syncMaterialsProjectData() {
+      if (!materialsProjectKeyInput || !materialsProjectStatus || materialsProjectSyncing) return;
+      const apiKey = materialsProjectKeyInput.value.trim() || defaultMaterialsProjectApiKey;
+      if (!apiKey) {
+        materialsProjectStatus.textContent = '请先填写 Materials Project API Key。';
+        materialsProjectStatus.classList.add('error');
+        return;
+      }
+      materialsProjectSyncing = true;
+      materialsProjectStatus.classList.remove('error');
+      materialsProjectStatus.textContent = '正在从 Materials Project 获取半导体数据...';
+      if (materialsProjectSyncButton) {
+        materialsProjectSyncButton.disabled = true;
+      }
+      try {
+        const aggregated = [];
+        const pageSize = 200;
+        const maxPages = 5;
+        for (let page = 1; page <= maxPages; page += 1) {
+          const payload = await requestMaterialsProjectPage(apiKey, page, pageSize);
+          const results = Array.isArray(payload?.data)
+            ? payload.data
+            : Array.isArray(payload?.results)
+              ? payload.results
+              : [];
+          if (!results.length) {
+            if (page === 1) {
+              throw new Error('未返回数据，请检查 API Key 或网络连接。');
+            }
+            break;
+          }
+          aggregated.push(...results);
+          if (results.length < pageSize) {
+            break;
+          }
+        }
+        const mapped = aggregated.map((entry) => mapMaterialsProjectEntry(entry)).filter(Boolean);
+        if (!mapped.length) {
+          materialsProjectStatus.textContent = '未获取到符合条件的半导体数据，可尝试放宽带隙筛选。';
+          materialsProjectStatus.classList.add('error');
+          return;
+        }
+        const { added, updated } = mergeMaterialsProjectData(mapped);
+        refreshSemiconductorDatalist();
+        materialsProjectStatus.textContent = `已同步 ${mapped.length} 条 Materials Project 记录，新增 ${added} 条，更新 ${updated} 条。`;
+        materialsProjectStatus.classList.remove('error');
+      } catch (error) {
+        materialsProjectStatus.textContent = `同步失败：${error.message || error}`;
+        materialsProjectStatus.classList.add('error');
+        console.error(error);
+      } finally {
+        materialsProjectSyncing = false;
+        if (materialsProjectSyncButton) {
+          materialsProjectSyncButton.disabled = false;
+        }
+      }
+    }
+
+    async function requestMaterialsProjectPage(apiKey, page, pageSize) {
+      const response = await fetch(materialsProjectEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': apiKey
+        },
+        body: JSON.stringify({
+          criteria: {
+            band_gap: { $gt: 0.05 },
+            energy_above_hull: { $lte: 0.1 }
+          },
+          properties: [
+            'material_id',
+            'formula_pretty',
+            'material_name',
+            'band_gap',
+            'is_gap_direct',
+            'spacegroup',
+            'crystal_system',
+            'density',
+            'energy_above_hull',
+            'formation_energy_per_atom',
+            'efermi'
+          ],
+          pagination: { page, page_size: pageSize },
+          sort_fields: ['band_gap'],
+          sort_order: 'asc'
+        })
+      });
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `HTTP ${response.status}`);
+      }
+      const payload = await response.json().catch(() => {
+        throw new Error('无法解析 Materials Project 返回的数据。');
+      });
+      return payload;
+    }
+
+    function mapMaterialsProjectEntry(entry) {
+      if (!entry) return null;
+      const formula =
+        entry.formula_pretty ||
+        entry.formula ||
+        entry.pretty_formula ||
+        entry.chemical_formula_reduced ||
+        entry.chemical_formula;
+      if (!formula) return null;
+      const name = entry.material_name || entry.common_name || formula;
+      const bandGapField = entry.band_gap ?? entry.bandGap ?? entry.egap ?? null;
+      let bandGapValue = null;
+      if (typeof bandGapField === 'number') {
+        bandGapValue = bandGapField;
+      } else if (bandGapField && typeof bandGapField === 'object') {
+        if (typeof bandGapField.energy === 'number') bandGapValue = bandGapField.energy;
+        else if (typeof bandGapField.value === 'number') bandGapValue = bandGapField.value;
+        else if (typeof bandGapField.gap === 'number') bandGapValue = bandGapField.gap;
+        else if (typeof bandGapField.direct_gap === 'number') bandGapValue = bandGapField.direct_gap;
+      }
+      if (typeof bandGapValue !== 'number' || bandGapValue <= 0.05) {
+        return null;
+      }
+      let isDirect = entry.is_gap_direct ?? entry.is_direct ?? bandGapField?.direct ?? bandGapField?.is_direct;
+      if (typeof isDirect !== 'boolean') {
+        isDirect = null;
+      }
+      const bandGapType = isDirect === null ? 'unknown' : isDirect ? 'direct' : 'indirect';
+      const temperatureLabel =
+        bandGapField && typeof bandGapField === 'object' && typeof bandGapField.temperature === 'number'
+          ? `${bandGapField.temperature} K`
+          : 'Materials Project (DFT)';
+      const spacegroup = entry.spacegroup || {};
+      const mpData = {
+        materialId: entry.material_id || entry.materialId || null,
+        crystalSystem: spacegroup.crystal_system || entry.crystal_system || entry.crystalSystem || '',
+        spacegroupSymbol: spacegroup.symbol || entry.spacegroup_symbol || entry.spacegroupSymbol || '',
+        energyAboveHull: entry.energy_above_hull ?? entry.energyAboveHull ?? null,
+        formationEnergy: entry.formation_energy_per_atom ?? entry.formationEnergyPerAtom ?? null,
+        density: entry.density ?? null,
+        efermi: entry.efermi ?? null
+      };
+      const crystalStructure = mpData.crystalSystem || mpData.spacegroupSymbol
+        ? `${mpData.crystalSystem || ''}${mpData.spacegroupSymbol ? ` (${mpData.spacegroupSymbol})` : ''}`.trim()
+        : entry.crystal_structure || entry.symmetry || '—';
+      const aliases = Array.from(
+        new Set([formula, name, mpData.materialId, entry.material_id_short, ...(entry.elements || [])])
+      ).filter(Boolean);
+      return {
+        name,
+        formula,
+        aliases,
+        bandGap: {
+          value: Number(bandGapValue),
+          type: bandGapType,
+          temperature: temperatureLabel
+        },
+        crystalStructure,
+        electronMobility: '—',
+        holeMobility: '—',
+        applications: '—',
+        notes: '数据来源：Materials Project (DFT 计算结果)。',
+        mp: mpData
+      };
+    }
+
+    function mergeMaterialsProjectData(newMaterials) {
+      let added = 0;
+      let updated = 0;
+      const seenIds = new Set();
+      newMaterials.forEach((material) => {
+        if (!material) return;
+        const materialId = material.mp?.materialId;
+        if (materialId) {
+          const normalizedId = normalizeForMatch(materialId);
+          if (seenIds.has(normalizedId)) {
+            return;
+          }
+          seenIds.add(normalizedId);
+        }
+        const normalizedFormula = normalizeForMatch(material.formula);
+        let existing = null;
+        if (materialId) {
+          existing = semiconductorMaterials.find(
+            (item) => item.mp?.materialId && normalizeForMatch(item.mp.materialId) === normalizeForMatch(materialId)
+          );
+        }
+        if (!existing && normalizedFormula) {
+          existing = semiconductorMaterials.find(
+            (item) => normalizeForMatch(item.formula) === normalizedFormula
+          );
+        }
+        if (existing) {
+          const aliasSet = new Set([...(existing.aliases || []), ...(material.aliases || [])]);
+          existing.aliases = Array.from(aliasSet).filter(Boolean);
+          if (material.bandGap && material.bandGap.value && (!existing.bandGap || !existing.bandGap.value)) {
+            existing.bandGap = material.bandGap;
+          }
+          if (!existing.crystalStructure && material.crystalStructure) {
+            existing.crystalStructure = material.crystalStructure;
+          }
+          if (!hasMeaningfulValue(existing.electronMobility) && hasMeaningfulValue(material.electronMobility)) {
+            existing.electronMobility = material.electronMobility;
+          }
+          if (!hasMeaningfulValue(existing.holeMobility) && hasMeaningfulValue(material.holeMobility)) {
+            existing.holeMobility = material.holeMobility;
+          }
+          if (!hasMeaningfulValue(existing.applications) && hasMeaningfulValue(material.applications)) {
+            existing.applications = material.applications;
+          }
+          if (material.mp) {
+            existing.mp = material.mp;
+          }
+          if (material.notes) {
+            if (!existing.notes) {
+              existing.notes = material.notes;
+            } else if (!existing.notes.includes('Materials Project')) {
+              existing.notes += `；${material.notes}`;
+            }
+          }
+          updated += 1;
+        } else {
+          semiconductorMaterials.push(material);
+          added += 1;
+        }
+      });
+      return { added, updated };
     }
 
     if (semiconductorButton) {
@@ -2943,7 +3684,6 @@
         }
       });
     }
-
     document.getElementById('molar-btn').addEventListener('click', () => {
       const formulaInput = document.getElementById('formula-input');
       const formula = formulaInput.value.trim();
@@ -2953,27 +3693,12 @@
         return;
       }
       try {
-        const composition = parseFormula(formula);
-        const missing = Array.from(composition.keys()).filter((symbol) => !elementMass[symbol]);
-        if (missing.length) {
-          output.textContent = `未识别的元素符号：${missing.join(', ')}`;
-          return;
-        }
-        let totalMass = 0;
-        const breakdown = [];
-        const sorted = Array.from(composition.entries()).sort((a, b) => {
-          const elementA = elementBySymbol.get(a[0]);
-          const elementB = elementBySymbol.get(b[0]);
-          return (elementA?.number || 999) - (elementB?.number || 999);
-        });
-        sorted.forEach(([symbol, count]) => {
-          const mass = elementMass[symbol];
-          const contribution = mass * count;
-          totalMass += contribution;
-          breakdown.push(`${symbol}<sub>${count}</sub>：${mass.toFixed(3)} × ${count} = ${contribution.toFixed(3)}`);
-        });
-        output.innerHTML = `相对分子质量 Mr = <strong>${totalMass.toFixed(3)}</strong> g·mol⁻¹` +
-          (breakdown.length ? `<br>组成贡献：<br>${breakdown.join('<br>')}` : '');
+        const { molarMass, breakdown } = calculateMolarMass(formula);
+        const details = breakdown
+          .map((item) => `${item.symbol}<sub>${item.count}</sub>：${item.mass.toFixed(3)} × ${item.count} = ${item.contribution.toFixed(3)}`)
+          .join('<br>');
+        output.innerHTML = `相对分子质量 Mr = <strong>${molarMass.toFixed(3)}</strong> g·mol⁻¹`
+          + (breakdown.length ? `<br>组成贡献：<br>${details}` : '');
       } catch (error) {
         output.textContent = error.message;
       }
