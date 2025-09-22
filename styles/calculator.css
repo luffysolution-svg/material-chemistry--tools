@@ -1,0 +1,408 @@
+/* 计算器专用样式 - Calculator Specific Styles */
+
+.calc-form {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1rem;
+}
+
+.calc-form h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    text-align: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e74c3c;
+}
+
+/* 计算器特殊布局 */
+.calc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.calc-input-row {
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.calc-input-group {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* 单位转换特殊样式 */
+.conversion-calculator {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.conversion-calculator h3 {
+    color: white;
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.conversion-display {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    backdrop-filter: blur(10px);
+}
+
+.conversion-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.conversion-input,
+.conversion-output {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.conversion-input input,
+.conversion-output input,
+.conversion-input select,
+.conversion-output select {
+    border: none;
+    background: transparent;
+    flex: 1;
+    font-size: 1rem;
+    color: #2c3e50;
+}
+
+.conversion-arrow {
+    font-size: 2rem;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateX(0); }
+    40% { transform: translateX(-5px); }
+    60% { transform: translateX(5px); }
+}
+
+/* 溶液配制计算器 */
+.solution-calculator {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+.solution-calculator h3 {
+    color: white;
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.solution-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.solution-input-group {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 1rem;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.solution-input-group label {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.solution-input-group input {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem;
+    width: 100%;
+    color: #2c3e50;
+}
+
+/* pH计算器 */
+.ph-calculator {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+.ph-calculator h3 {
+    color: white;
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.ph-scale {
+    background: linear-gradient(90deg, 
+        #ff0000 0%, #ff4500 14%, #ffa500 28%, 
+        #ffff00 42%, #9acd32 57%, #00ff00 71%, 
+        #00ffff 85%, #0000ff 100%);
+    height: 30px;
+    border-radius: 15px;
+    margin: 1rem 0;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.ph-indicator {
+    position: absolute;
+    top: -10px;
+    width: 4px;
+    height: 50px;
+    background: white;
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: left 0.3s ease;
+}
+
+.ph-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* 晶体计算器 */
+.crystal-calculator {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    color: #2c3e50;
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+.crystal-system-selector {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.lattice-parameter-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.lattice-input {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.lattice-input label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.lattice-input input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    background: white;
+}
+
+.crystal-visualization {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-style: italic;
+    color: #7f8c8d;
+}
+
+/* 结果显示 */
+.calc-result {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #27ae60;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.calc-result h4 {
+    color: #27ae60;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.result-item {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #27ae60;
+}
+
+.result-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.result-value {
+    font-size: 1.1rem;
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.result-unit {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-left: 0.5rem;
+}
+
+/* 错误状态 */
+.calc-result.error {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: #e74c3c;
+}
+
+.calc-result.error h4 {
+    color: #e74c3c;
+}
+
+.calc-result.error .result-item {
+    border-left-color: #e74c3c;
+}
+
+.calc-result.error .result-value {
+    color: #e74c3c;
+}
+
+/* 加载状态 */
+.calc-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    margin-left: 0.5rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 工具提示 */
+.calc-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    border-bottom: 1px dotted #ccc;
+}
+
+.calc-tooltip .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: #2c3e50;
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    padding: 0.5rem;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.8rem;
+}
+
+.calc-tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .calc-form {
+        padding: 1.5rem;
+    }
+    
+    .conversion-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .conversion-arrow {
+        transform: rotate(90deg);
+        align-self: center;
+        margin: 0.5rem 0;
+    }
+    
+    .solution-inputs {
+        grid-template-columns: 1fr;
+    }
+    
+    .lattice-parameter-inputs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .conversion-calculator,
+    .solution-calculator,
+    .ph-calculator,
+    .crystal-calculator {
+        padding: 1rem;
+    }
+    
+    .lattice-parameter-inputs {
+        grid-template-columns: 1fr;
+    }
+    
+    .calc-input-row {
+        flex-direction: column;
+    }
+}

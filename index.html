@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>材料化学工具 - Material Chemistry Tools</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/periodic-table.css">
+    <link rel="stylesheet" href="styles/calculator.css">
+</head>
+<body>
+    <header>
+        <nav class="main-nav">
+            <div class="nav-container">
+                <h1 class="nav-title">材料化学工具箱</h1>
+                <h2 class="nav-subtitle">Material Chemistry Tools</h2>
+                <ul class="nav-menu">
+                    <li><a href="#periodic-table" onclick="showSection('periodic-table')">元素周期表</a></li>
+                    <li><a href="#calculations" onclick="showSection('calculations')">化学计算</a></li>
+                    <li><a href="#materials" onclick="showSection('materials')">物质查询</a></li>
+                    <li><a href="#database" onclick="showSection('database')">数据库</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- 元素周期表部分 -->
+        <section id="periodic-table" class="main-section active">
+            <div class="section-header">
+                <h2>元素周期表 - Periodic Table</h2>
+                <p>点击元素查看详细信息 | Click elements for detailed information</p>
+            </div>
+            <div class="periodic-table-container">
+                <div id="periodic-table-grid" class="periodic-grid">
+                    <!-- 周期表将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            <!-- 元素信息弹窗 -->
+            <div id="element-modal" class="element-modal">
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    <div id="element-info" class="element-info">
+                        <!-- 元素详细信息将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 化学计算部分 -->
+        <section id="calculations" class="main-section">
+            <div class="section-header">
+                <h2>化学计算工具 - Chemical Calculation Tools</h2>
+            </div>
+            <div class="calculator-container">
+                <div class="calc-tabs">
+                    <button class="calc-tab active" onclick="showCalculator('unit-conversion')">单位换算</button>
+                    <button class="calc-tab" onclick="showCalculator('solution-prep')">溶液配制</button>
+                    <button class="calc-tab" onclick="showCalculator('ph-calculator')">pH计算</button>
+                    <button class="calc-tab" onclick="showCalculator('crystal-calc')">晶体计算</button>
+                </div>
+
+                <!-- 单位换算计算器 -->
+                <div id="unit-conversion" class="calculator active">
+                    <h3>单位换算 - Unit Conversion</h3>
+                    <div class="calc-form">
+                        <div class="form-group">
+                            <label for="conversion-type">转换类型:</label>
+                            <select id="conversion-type" onchange="updateConversionOptions()">
+                                <option value="mass">质量 (Mass)</option>
+                                <option value="volume">体积 (Volume)</option>
+                                <option value="temperature">温度 (Temperature)</option>
+                                <option value="pressure">压强 (Pressure)</option>
+                                <option value="energy">能量 (Energy)</option>
+                            </select>
+                        </div>
+                        <div class="conversion-row">
+                            <div class="input-group">
+                                <input type="number" id="input-value" placeholder="输入数值">
+                                <select id="input-unit"></select>
+                            </div>
+                            <span class="conversion-arrow">→</span>
+                            <div class="output-group">
+                                <input type="number" id="output-value" readonly>
+                                <select id="output-unit"></select>
+                            </div>
+                        </div>
+                        <button onclick="convertUnits()">转换</button>
+                    </div>
+                </div>
+
+                <!-- 溶液配制计算器 -->
+                <div id="solution-prep" class="calculator">
+                    <h3>溶液配制 - Solution Preparation</h3>
+                    <div class="calc-form">
+                        <div class="form-group">
+                            <label for="solute-formula">溶质化学式:</label>
+                            <input type="text" id="solute-formula" placeholder="例如: NaCl">
+                        </div>
+                        <div class="form-group">
+                            <label for="target-concentration">目标浓度 (mol/L):</label>
+                            <input type="number" id="target-concentration" step="0.001" placeholder="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="target-volume">目标体积 (mL):</label>
+                            <input type="number" id="target-volume" placeholder="1000">
+                        </div>
+                        <button onclick="calculateSolution()">计算所需质量</button>
+                        <div id="solution-result" class="calc-result"></div>
+                    </div>
+                </div>
+
+                <!-- pH计算器 -->
+                <div id="ph-calculator" class="calculator">
+                    <h3>pH值计算 - pH Calculator</h3>
+                    <div class="calc-form">
+                        <div class="calc-tabs-sub">
+                            <button class="calc-tab-sub active" onclick="showPHCalc('strong-acid')">强酸强碱</button>
+                            <button class="calc-tab-sub" onclick="showPHCalc('weak-acid')">弱酸弱碱</button>
+                            <button class="calc-tab-sub" onclick="showPHCalc('buffer')">缓冲溶液</button>
+                        </div>
+                        <div id="strong-acid" class="ph-calc-type active">
+                            <div class="form-group">
+                                <label for="acid-concentration">酸/碱浓度 (mol/L):</label>
+                                <input type="number" id="acid-concentration" step="0.001" placeholder="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="solution-type">溶液类型:</label>
+                                <select id="solution-type">
+                                    <option value="acid">强酸</option>
+                                    <option value="base">强碱</option>
+                                </select>
+                            </div>
+                            <button onclick="calculatePH()">计算pH值</button>
+                        </div>
+                        <div id="ph-result" class="calc-result"></div>
+                    </div>
+                </div>
+
+                <!-- 晶体计算器 -->
+                <div id="crystal-calc" class="calculator">
+                    <h3>晶体计算 - Crystal Calculations</h3>
+                    <div class="calc-form">
+                        <div class="calc-tabs-sub">
+                            <button class="calc-tab-sub active" onclick="showCrystalCalc('lattice-param')">晶格参数</button>
+                            <button class="calc-tab-sub" onclick="showCrystalCalc('density')">密度计算</button>
+                            <button class="calc-tab-sub" onclick="showCrystalCalc('dhkl')">d-spacing</button>
+                        </div>
+                        <div id="lattice-param" class="crystal-calc-type active">
+                            <div class="form-group">
+                                <label for="crystal-system">晶系:</label>
+                                <select id="crystal-system">
+                                    <option value="cubic">立方</option>
+                                    <option value="tetragonal">四方</option>
+                                    <option value="orthorhombic">正交</option>
+                                    <option value="hexagonal">六方</option>
+                                    <option value="trigonal">三方</option>
+                                    <option value="monoclinic">单斜</option>
+                                    <option value="triclinic">三斜</option>
+                                </select>
+                            </div>
+                            <div class="lattice-inputs" id="lattice-inputs">
+                                <!-- 晶格参数输入框将根据晶系动态生成 -->
+                            </div>
+                            <button onclick="calculateLattice()">计算体积</button>
+                        </div>
+                        <div id="crystal-result" class="calc-result"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 物质查询部分 -->
+        <section id="materials" class="main-section">
+            <div class="section-header">
+                <h2>物质查询 - Material Properties</h2>
+            </div>
+            <div class="material-search">
+                <div class="search-form">
+                    <input type="text" id="material-search-input" placeholder="输入化学式、CAS号、中英文名称或简称">
+                    <button onclick="searchMaterial()">搜索</button>
+                </div>
+                <div class="search-results">
+                    <div id="material-info" class="material-info">
+                        <!-- 物质信息将在这里显示 -->
+                    </div>
+                    <div id="material-properties" class="material-properties">
+                        <!-- 材料性质将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 数据库部分 -->
+        <section id="database" class="main-section">
+            <div class="section-header">
+                <h2>数据库管理 - Database Management</h2>
+            </div>
+            <div class="database-info">
+                <div class="data-sources">
+                    <h3>数据来源 - Data Sources</h3>
+                    <ul>
+                        <li>PubChem - 化学物质数据库</li>
+                        <li>Materials Project - 材料性质数据库</li>
+                        <li>内置元素周期表数据</li>
+                    </ul>
+                </div>
+                <div class="offline-status">
+                    <h3>离线状态 - Offline Status</h3>
+                    <div id="offline-indicator" class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span id="status-text">检查中...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2024 Material Chemistry Tools. 专为材料化学研究人员设计.</p>
+            <p>Designed for Materials Chemistry Researchers.</p>
+        </div>
+    </footer>
+
+    <script src="js/elements-data.js"></script>
+    <script src="js/periodic-table.js"></script>
+    <script src="js/calculations.js"></script>
+    <script src="js/materials.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
