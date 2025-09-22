@@ -684,16 +684,29 @@
         <summary>Materials Project 数据同步</summary>
         <div class="api-actions">
           <div>
-            <label for="materials-project-key">API Key</label>
-            <input type="password" id="materials-project-key" value="ctx7sk-69a779e2-0d39-4fdd-bbbe-2697f6a1bf73" autocomplete="off" />
+            <label for="materials-project-key">API Token</label>
+            <input
+              type="password"
+              id="materials-project-key"
+              placeholder="请输入 Materials Project token"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              inputmode="text"
+            />
           </div>
           <div>
             <label for="materials-project-sync-btn">&nbsp;</label>
-            <button type="button" id="materials-project-sync-btn" style="width: 100%;">同步半导体数据</button>
+            <button type="button" id="materials-project-sync-btn" style="width: 100%;" disabled>同步半导体数据</button>
           </div>
         </div>
-        <p class="api-hint">使用 Materials Project API 实时扩充半导体材料库，默认筛选带隙 &gt; 0.05 eV 且能量高于稳定相不超过 0.1 eV 的材料。确保网络可访问后点击同步按钮。</p>
-        <div id="materials-project-status" class="api-status" aria-live="polite">尚未同步，保持网络通畅后点击“同步半导体数据”。</div>
+        <p class="api-hint">内置数据库已覆盖常见半导体，若需补充长尾材料，请通过后端代理调用 Materials Project 接口。出于安全考虑，密钥仅用于当前同步请求，不会写入浏览器存储。</p>
+        <div
+          id="materials-project-status"
+          class="api-status"
+          aria-live="polite"
+          data-state="idle"
+        >请输入 Materials Project API token 以启用同步；若由服务器代理，请确认已配置凭据。密钥仅在请求期间保留于内存。</div>
       </details>
       <details class="reference-card">
         <summary>常见半导体带隙参考</summary>
@@ -2730,8 +2743,8 @@
         crystalStructure: '锌闪石结构 (F4̄3m)',
         electronMobility: '≈ 5400 cm²·V⁻¹·s⁻¹',
         holeMobility: '≈ 200 cm²·V⁻¹·s⁻¹',
-        applications: '高速光通信、激光器、太赫兹器件',
-        notes: '常与 InGaAs 量子阱外延组合用于光通信波段。'
+        applications: '高速光通信、量子级联激光器、深红外探测',
+        notes: '数据参考：Sze《半导体器件物理》及 Ioffe Institute 半导体数据库。'
       },
       {
         name: '碲化镉',
@@ -2776,6 +2789,204 @@
         holeMobility: '≈ 40 cm²·V⁻¹·s⁻¹',
         applications: '钙钛矿薄膜太阳能电池、光电探测器',
         notes: '需良好封装以抑制湿度与热导致的退化。'
+      },
+      {
+        name: '磷化镓',
+        formula: 'GaP',
+        aliases: ['磷化镓', 'gap', 'gallium phosphide'],
+        bandGap: { value: 2.26, type: 'indirect', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 110 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 35 cm²·V⁻¹·s⁻¹',
+        applications: '红黄光发光二极管、非线性光学器件',
+        notes: '间接带隙，可通过氮化调节至绿光区。数据来源：Ioffe Institute 数据库。'
+      },
+      {
+        name: '砷化铟',
+        formula: 'InAs',
+        aliases: ['砷化铟', 'inas', 'indium arsenide'],
+        bandGap: { value: 0.36, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 30000 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 500 cm²·V⁻¹·s⁻¹',
+        applications: '中红外探测、霍尔器件、高电子迁移率晶体管',
+        notes: '数据参考：Sze《半导体器件物理》。极高电子迁移率适合低噪声放大器。'
+      },
+      {
+        name: '锑化铟',
+        formula: 'InSb',
+        aliases: ['锑化铟', 'insb', 'indium antimonide'],
+        bandGap: { value: 0.17, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 77000 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 850 cm²·V⁻¹·s⁻¹',
+        applications: '超灵敏红外探测、磁场传感、低温电子学',
+        notes: '窄带隙导致本征载流子浓度高，需低温工作。数据来源：Ioffe Institute 数据库。'
+      },
+      {
+        name: '锑化镓',
+        formula: 'GaSb',
+        aliases: ['锑化镓', 'gasb', 'gallium antimonide'],
+        bandGap: { value: 0.73, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 3800 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 850 cm²·V⁻¹·s⁻¹',
+        applications: '中红外激光器、热电制冷、异质结场效应晶体管',
+        notes: '与 InAs 形成异质结构可实现高迁移率沟道。数据参考：Sze《半导体器件物理》。'
+      },
+      {
+        name: '氮化铝',
+        formula: 'AlN',
+        aliases: ['氮化铝', 'aln', 'aluminium nitride'],
+        bandGap: { value: 6.2, type: 'direct', temperature: '300 K' },
+        crystalStructure: '纤锌矿结构 (P6₃mc)',
+        electronMobility: '≈ 300 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 20 cm²·V⁻¹·s⁻¹',
+        applications: '深紫外 LED、声表面波器件、高温电子封装',
+        notes: '超宽带隙，具备优异热导率。数据参考：NIMS MatNavi 与相关文献。'
+      },
+      {
+        name: '氮化铝镓',
+        formula: 'AlGaN',
+        aliases: ['氮化铝镓', 'algan', 'aluminum gallium nitride'],
+        bandGap: { value: 4.5, type: 'direct', temperature: '300 K (x≈0.3)' },
+        crystalStructure: '纤锌矿结构 (P6₃mc)',
+        electronMobility: '≈ 900 cm²·V⁻¹·s⁻¹（二维电子气）',
+        holeMobility: '≈ 15 cm²·V⁻¹·s⁻¹',
+        applications: '高电子迁移率晶体管（HEMT）、深紫外发光器件',
+        notes: 'Al 组分可调以改变带隙与二维电子气特性。数据参考：IEEE TED 期刊。'
+      },
+      {
+        name: 'β-氧化镓',
+        formula: 'β-Ga₂O₃',
+        aliases: ['β-ga₂o₃', 'beta-ga2o3', '氧化镓', 'ga2o3'],
+        bandGap: { value: 4.8, type: 'indirect', temperature: '300 K' },
+        crystalStructure: '单斜 β 相 (C2/m)',
+        electronMobility: '≈ 250 cm²·V⁻¹·s⁻¹（外延薄膜）',
+        holeMobility: '≈ 1 cm²·V⁻¹·s⁻¹（估算）',
+        applications: '高压功率电子、深紫外探测器',
+        notes: '超宽带隙且击穿场强高达 8 MV·cm⁻¹。数据来源：APL Materials 2018, 6, 022102。'
+      },
+      {
+        name: '硒化锌',
+        formula: 'ZnSe',
+        aliases: ['硒化锌', 'znse', 'zinc selenide'],
+        bandGap: { value: 2.7, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 1000 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 40 cm²·V⁻¹·s⁻¹',
+        applications: '绿光激光器、红外光学窗口、量子点基底',
+        notes: '数据参考：CRC Handbook 与 Ioffe Institute 数据库。'
+      },
+      {
+        name: '硫化锌',
+        formula: 'ZnS',
+        aliases: ['硫化锌', 'zns', 'zinc sulfide'],
+        bandGap: { value: 3.6, type: 'direct', temperature: '300 K' },
+        crystalStructure: '闪锌矿或纤锌矿 (F4̄3m / P6₃mc)',
+        electronMobility: '≈ 250 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 15 cm²·V⁻¹·s⁻¹',
+        applications: '荧光粉、红外窗口、光电探测器',
+        notes: '宽带隙 II-VI 半导体，可通过掺杂调节发光。数据来源：Optical Materials 期刊。'
+      },
+      {
+        name: '硫化镉',
+        formula: 'CdS',
+        aliases: ['硫化镉', 'cds', 'cadmium sulfide'],
+        bandGap: { value: 2.42, type: 'direct', temperature: '300 K' },
+        crystalStructure: '纤锌矿结构 (P6₃mc)',
+        electronMobility: '≈ 350 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 50 cm²·V⁻¹·s⁻¹',
+        applications: '光导电池、薄膜太阳能电池缓冲层',
+        notes: '常与 CdTe、CuInSe₂ 等材料组成异质结。数据参考：Ioffe Institute 数据库。'
+      },
+      {
+        name: '硒化镉',
+        formula: 'CdSe',
+        aliases: ['硒化镉', 'cdse', 'cadmium selenide'],
+        bandGap: { value: 1.74, type: 'direct', temperature: '300 K' },
+        crystalStructure: '纤锌矿结构 (P6₃mc)',
+        electronMobility: '≈ 1050 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 90 cm²·V⁻¹·s⁻¹',
+        applications: '量子点发光、光伏器件、光电探测',
+        notes: '纳米晶可覆盖可见光至近红外发光。数据参考：CRC Handbook。'
+      },
+      {
+        name: '硒化铜铟',
+        formula: 'CuInSe₂',
+        aliases: ['硒化铜铟', 'cuinse2', 'cis', 'copper indium diselenide'],
+        bandGap: { value: 1.04, type: 'direct', temperature: '300 K' },
+        crystalStructure: '四方黄铜矿结构 (I4̄2d)',
+        electronMobility: '≈ 100 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 70 cm²·V⁻¹·s⁻¹',
+        applications: '薄膜太阳能电池、光伏组件',
+        notes: 'CIGS 族材料核心成员，转换效率高。数据参考：Progress in Photovoltaics。'
+      },
+      {
+        name: '硒化铜镓',
+        formula: 'CuGaSe₂',
+        aliases: ['硒化铜镓', 'cugase2', 'cgs', 'copper gallium diselenide'],
+        bandGap: { value: 1.68, type: 'direct', temperature: '300 K' },
+        crystalStructure: '四方黄铜矿结构 (I4̄2d)',
+        electronMobility: '≈ 50 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 60 cm²·V⁻¹·s⁻¹',
+        applications: '多结太阳能电池、光伏吸收层',
+        notes: '与 CuInSe₂ 形成固溶体可调带隙。数据来源：Solar Energy Materials & Solar Cells。'
+      },
+      {
+        name: '硫化铜锌锡',
+        formula: 'Cu₂ZnSnS₄',
+        aliases: ['硫化铜锌锡', 'cu2znsns4', 'czts', 'kesterite'],
+        bandGap: { value: 1.5, type: 'direct', temperature: '300 K' },
+        crystalStructure: '正四方黄铜矿结构 (I4̄)',
+        electronMobility: '≈ 40 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 10 cm²·V⁻¹·s⁻¹',
+        applications: '环保型薄膜太阳能电池',
+        notes: '全部由地球丰度元素构成，是 CdTe 与 CIGS 的绿色替代。数据参考：Advanced Energy Materials。'
+      },
+      {
+        name: '二硫化钨',
+        formula: 'WS₂',
+        aliases: ['二硫化钨', 'ws2', 'tungsten disulfide'],
+        bandGap: { value: 2.1, type: 'direct', temperature: '室温 (单层)' },
+        crystalStructure: '层状六方 (P6₃/mmc)',
+        electronMobility: '≈ 200 cm²·V⁻¹·s⁻¹（单层）',
+        holeMobility: '≈ 150 cm²·V⁻¹·s⁻¹（单层）',
+        applications: '二维光电晶体管、可饱和吸收体、柔性电子',
+        notes: '厚度从多层到单层时带隙由间接变为直接。数据参考：Nature Nanotechnology。'
+      },
+      {
+        name: '二硒化钨',
+        formula: 'WSe₂',
+        aliases: ['二硒化钨', 'wse2', 'tungsten diselenide'],
+        bandGap: { value: 1.65, type: 'direct', temperature: '室温 (单层)' },
+        crystalStructure: '层状六方 (P6₃/mmc)',
+        electronMobility: '≈ 250 cm²·V⁻¹·s⁻¹（单层）',
+        holeMobility: '≈ 200 cm²·V⁻¹·s⁻¹（单层）',
+        applications: '对称型 CMOS 兼容二维器件、光催化',
+        notes: '具备高迁移率与可调带隙，适合 2D CMOS 研究。数据参考：ACS Nano。'
+      },
+      {
+        name: '黑磷',
+        formula: 'BP',
+        aliases: ['黑磷', 'bp', 'black phosphorus', '磷烯'],
+        bandGap: { value: 0.3, type: 'direct', temperature: '300 K (体相)' },
+        crystalStructure: '正交结构 (Cmca)',
+        electronMobility: '≈ 1000 cm²·V⁻¹·s⁻¹（薄层）',
+        holeMobility: '≈ 650 cm²·V⁻¹·s⁻¹（薄层）',
+        applications: '可调中红外光电器件、光纤调制器、传感',
+        notes: '层数减少时带隙可拓展至 ~2 eV。数据参考：Nature Nanotechnology。'
+      },
+      {
+        name: '铟镓砷',
+        formula: 'In₀.₅₃Ga₀.₄₇As',
+        aliases: ['铟镓砷', 'ingaas', 'in0.53ga0.47as', '铟镓砷异质结'],
+        bandGap: { value: 0.75, type: 'direct', temperature: '300 K' },
+        crystalStructure: '锌闪石结构 (F4̄3m)',
+        electronMobility: '≈ 12000 cm²·V⁻¹·s⁻¹',
+        holeMobility: '≈ 400 cm²·V⁻¹·s⁻¹',
+        applications: '高速光纤通信、pHEMT、短波红外探测',
+        notes: '晶格匹配 InP 衬底，适合高速光电集成。数据参考：IEEE EDL。'
       }
     ];
 
@@ -3167,12 +3378,28 @@
     const materialsProjectKeyInput = document.getElementById('materials-project-key');
     const materialsProjectSyncButton = document.getElementById('materials-project-sync-btn');
     const materialsProjectStatus = document.getElementById('materials-project-status');
-    const defaultMaterialsProjectApiKey = 'ctx7sk-69a779e2-0d39-4fdd-bbbe-2697f6a1bf73';
-    const materialsProjectEndpoint = 'https://api.materialsproject.org/materials/summary/';
+    const materialsProjectSyncEndpoint = '/api/materials/sync';
+    const materialsProjectDefaultStatus =
+      '请输入 Materials Project API token 以启用同步；若由服务器代理，请确认已配置凭据。密钥仅在请求期间保留于内存。';
     let materialsProjectSyncing = false;
 
-    if (materialsProjectKeyInput && !materialsProjectKeyInput.value) {
-      materialsProjectKeyInput.value = defaultMaterialsProjectApiKey;
+    function updateMaterialsProjectSyncState() {
+      if (!materialsProjectKeyInput || !materialsProjectSyncButton) return;
+      const hasKey = Boolean(materialsProjectKeyInput.value.trim());
+      materialsProjectSyncButton.disabled = !hasKey || materialsProjectSyncing;
+      if (
+        !hasKey &&
+        materialsProjectStatus &&
+        materialsProjectStatus.dataset.state !== 'syncing'
+      ) {
+        materialsProjectStatus.classList.remove('error');
+        materialsProjectStatus.dataset.state = 'idle';
+        materialsProjectStatus.textContent = materialsProjectDefaultStatus;
+      }
+    }
+
+    if (materialsProjectStatus && !materialsProjectStatus.dataset.state) {
+      materialsProjectStatus.dataset.state = 'idle';
     }
 
     if (semiconductorList) {
@@ -3192,6 +3419,18 @@
           syncMaterialsProjectData();
         }
       });
+
+      materialsProjectKeyInput.addEventListener('input', () => {
+        if (materialsProjectStatus && materialsProjectStatus.dataset.state === 'error') {
+          materialsProjectStatus.classList.remove('error');
+          materialsProjectStatus.dataset.state = 'idle';
+          materialsProjectStatus.textContent = materialsProjectDefaultStatus;
+        }
+        updateMaterialsProjectSyncState();
+      });
+
+      materialsProjectKeyInput.addEventListener('change', updateMaterialsProjectSyncState);
+      updateMaterialsProjectSyncState();
     }
 
     const subscriptDigits = '₀₁₂₃₄₅₆₇₈₉';
@@ -3430,32 +3669,37 @@
 
     async function syncMaterialsProjectData() {
       if (!materialsProjectKeyInput || !materialsProjectStatus || materialsProjectSyncing) return;
-      const apiKey = materialsProjectKeyInput.value.trim() || defaultMaterialsProjectApiKey;
+      const apiKey = materialsProjectKeyInput.value.trim();
       if (!apiKey) {
-        materialsProjectStatus.textContent = '请先填写 Materials Project API Key。';
+        materialsProjectStatus.textContent = '请先输入 Materials Project API token。';
         materialsProjectStatus.classList.add('error');
+        materialsProjectStatus.dataset.state = 'error';
+        updateMaterialsProjectSyncState();
         return;
       }
+
       materialsProjectSyncing = true;
       materialsProjectStatus.classList.remove('error');
-      materialsProjectStatus.textContent = '正在从 Materials Project 获取半导体数据...';
-      if (materialsProjectSyncButton) {
-        materialsProjectSyncButton.disabled = true;
-      }
+      materialsProjectStatus.dataset.state = 'syncing';
+      materialsProjectStatus.textContent = '正在通过 /api/materials/sync 获取半导体数据…';
+      updateMaterialsProjectSyncState();
+
       try {
         const aggregated = [];
         const pageSize = 200;
         const maxPages = 5;
         for (let page = 1; page <= maxPages; page += 1) {
           const payload = await requestMaterialsProjectPage(apiKey, page, pageSize);
-          const results = Array.isArray(payload?.data)
-            ? payload.data
-            : Array.isArray(payload?.results)
-              ? payload.results
-              : [];
+          const results = Array.isArray(payload?.materials)
+            ? payload.materials
+            : Array.isArray(payload?.data)
+              ? payload.data
+              : Array.isArray(payload?.results)
+                ? payload.results
+                : [];
           if (!results.length) {
             if (page === 1) {
-              throw new Error('未返回数据，请检查 API Key 或网络连接。');
+              throw new Error('未返回数据，请检查 token 或确认代理服务可用。');
             }
             break;
           }
@@ -3464,64 +3708,72 @@
             break;
           }
         }
+
         const mapped = aggregated.map((entry) => mapMaterialsProjectEntry(entry)).filter(Boolean);
         if (!mapped.length) {
-          materialsProjectStatus.textContent = '未获取到符合条件的半导体数据，可尝试放宽带隙筛选。';
+          materialsProjectStatus.textContent = '未获取到符合条件的半导体数据，可尝试调整带隙或能量筛选范围。';
           materialsProjectStatus.classList.add('error');
+          materialsProjectStatus.dataset.state = 'error';
           return;
         }
+
         const { added, updated } = mergeMaterialsProjectData(mapped);
         refreshSemiconductorDatalist();
         materialsProjectStatus.textContent = `已同步 ${mapped.length} 条 Materials Project 记录，新增 ${added} 条，更新 ${updated} 条。`;
         materialsProjectStatus.classList.remove('error');
+        materialsProjectStatus.dataset.state = 'success';
       } catch (error) {
-        materialsProjectStatus.textContent = `同步失败：${error.message || error}`;
+        const reason = error?.message || error || '未知错误';
+        materialsProjectStatus.textContent = `同步失败：${reason}。请确认 API token 正确且服务器已配置 /api/materials/sync 代理。`;
         materialsProjectStatus.classList.add('error');
+        materialsProjectStatus.dataset.state = 'error';
         console.error(error);
       } finally {
         materialsProjectSyncing = false;
-        if (materialsProjectSyncButton) {
-          materialsProjectSyncButton.disabled = false;
-        }
+        updateMaterialsProjectSyncState();
       }
     }
 
     async function requestMaterialsProjectPage(apiKey, page, pageSize) {
-      const response = await fetch(materialsProjectEndpoint, {
+      const requestBody = {
+        page,
+        pageSize,
+        filters: {
+          bandGapMin: 0.05,
+          energyAboveHullMax: 0.1
+        },
+        properties: [
+          'material_id',
+          'formula_pretty',
+          'material_name',
+          'band_gap',
+          'is_gap_direct',
+          'spacegroup',
+          'crystal_system',
+          'density',
+          'energy_above_hull',
+          'formation_energy_per_atom',
+          'efermi'
+        ],
+        sort: { field: 'band_gap', order: 'asc' }
+      };
+      if (apiKey) {
+        requestBody.apiKey = apiKey;
+      }
+
+      const response = await fetch(materialsProjectSyncEndpoint, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-API-KEY': apiKey
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          criteria: {
-            band_gap: { $gt: 0.05 },
-            energy_above_hull: { $lte: 0.1 }
-          },
-          properties: [
-            'material_id',
-            'formula_pretty',
-            'material_name',
-            'band_gap',
-            'is_gap_direct',
-            'spacegroup',
-            'crystal_system',
-            'density',
-            'energy_above_hull',
-            'formation_energy_per_atom',
-            'efermi'
-          ],
-          pagination: { page, page_size: pageSize },
-          sort_fields: ['band_gap'],
-          sort_order: 'asc'
-        })
+        body: JSON.stringify(requestBody)
       });
       if (!response.ok) {
         const text = await response.text();
         throw new Error(text || `HTTP ${response.status}`);
       }
       const payload = await response.json().catch(() => {
-        throw new Error('无法解析 Materials Project 返回的数据。');
+        throw new Error('无法解析 Materials Project 代理返回的数据。');
       });
       return payload;
     }
